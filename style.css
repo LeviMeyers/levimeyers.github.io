@@ -1,0 +1,16 @@
+/*Comment syntax*/
+
+h1{
+    text-align: center;
+}
+
+/* ID (no two elements should have the same id) */
+#document-unique{
+    margin: auto;
+    padding: 20px;
+}
+
+/* basically just a tag */
+.list{
+    float: left
+}
