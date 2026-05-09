@@ -9,6 +9,10 @@ div{
     margin: 40px 80px;
 }
 
+li{
+    margin: 10px 10px;
+}
+
 /* ID (no two elements should have the same id) */
 #document-unique{
     margin: auto;
