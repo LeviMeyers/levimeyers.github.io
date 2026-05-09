@@ -1,7 +1,12 @@
-/*Comment syntax*/
+/* Comment syntax */
 
-h1{
-    text-align: center;
+/* psure * applies to everything */
+*{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div{
+    margin: 40px 80px;
 }
 
 /* ID (no two elements should have the same id) */
@@ -10,7 +15,7 @@ h1{
     padding: 20px;
 }
 
-/* basically just a tag */
+/* class (basically just a tag) */
 .list{
-    float: left
+    margin: auto;
 }
