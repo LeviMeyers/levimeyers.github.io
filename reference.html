@@ -17,18 +17,24 @@
             font-family: Arial, Helvetica, sans-serif;
         }
     </style>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stylereference.css">
+
+    <!--
+    scripts can go in head or body it doesnt really matter im psure
+    i cant put one here cause it runs infinitely and breaks the preview but just
+    use a script tag with the src attribute
+     -->
 </head>
 <body>
 
 <!-- Div is a way of categorizing elements -->
 <div>
-    <h1>This is a heading</h1>
+    <h1 style="font-family: '8bitoperator JVE', sans-serif">This is a heading</h1>
     <p style="text-align: center">Basic paragraph</p>
 
     <h3>List</h3>
     <ul class="list">
-        <li>Item 1</li>
+        <li class="list">Item 1</li>
         <li class="list">Item 2</li>
         <li class="list"><a href="README.md">Hyperlink</a></li>
     </ul>
@@ -36,14 +42,18 @@
     <p>Imagine there's a cool image here</p>
 </div>
 
-<form action="index.html" method="GET">
+<form action="reference.html" method="GET">
     <input type="text" name="name" placeholder="Enter text here">
-    <button type="submit">This text comes after the button is pressed</button>
+    <button type="submit">Button text</button>
 </form>
 
 <h3>Some CSS stuff</h3>
 <p id="document-unique">Cool text</p>
 <p style="color: slategrey; border: 4px lightgreen solid">Cool text (style override)</p>
+
+<script>
+    console.log("Hello")
+</script>
 
 </body>
 </html>

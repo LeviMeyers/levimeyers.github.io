@@ -1,8 +1,13 @@
 /* Comment syntax */
 
 /* psure * applies to everything */
+@font-face {
+    font-family: "8bitoperator JVE";
+    src: url(graphics/8bitoperator_jve.ttf);
+}
+
 *{
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "8bitoperator JVE", sans-serif;
 }
 
 div{
