@@ -2,22 +2,32 @@
 <html lang="en-us">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
 </head>
+
+<!--
+- Learn HTML/CSS/Javascript
+- Make pages: game selection, rudimentary settings, game page
+- Scrape fandom mediawikis using REST API for song info and music player widgets
+- Make modes: multiple choice, user input, different chapters, unused tracks, motifs, etc.
+- Advanced: gartic-phone type cross-platform multiplayer
+-->
+
 <body>
 
-<div>
-    <h2>The game plan</h2>
-    <ul>
-        <li>Learn HTML/CSS/Javascript</li>
-        <li>Make pages: game selection, rudimentary settings, game page</li>
-        <li>Scrape fandom mediawikis using REST API for song info and bandcamp file</li>
-        <li>Make modes: multiple choice, user input, different chapters, unused tracks, etc.</li>
-        <li><span style="color: grey">Maybe: </span>Gartic-phone type cross-platform multiplayer</li>
-        <button onclick="changeText(this)">Something</button>
-    </ul>
+<aside>
+    <a href="deltarune.html" class="listedGame" title="DELTARUNE">
+        <img src="graphics/icon_deltarune.png" alt="DELTARUNE" style="width: 100%">
+    </a>
+    <a href="undertale.html" class="listedGame" title="UNDERTALE">
+        <img src="graphics/icon_undertale.png" alt="UNDERTALE" style="width: 100%">
+    </a>
+</aside>
+
+<div id="content">
 </div>
 
 </body>

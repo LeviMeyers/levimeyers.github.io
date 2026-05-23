@@ -3,7 +3,28 @@
     src: url(graphics/8bitoperator_jve.ttf);
 }
 
+body {
+    background-color: #101014;
+    margin: 0;
+}
+
 * {
     font-family: "8bitoperator JVE", sans-serif;
     font-weight: normal;
+}
+
+div{}
+
+aside{
+    width: 100px;
+    height: 100%;
+    float: left;
+    background-color: #434357;
+    padding: 5px 0;
+}
+
+/* selected game color: #7ae49d */
+.listedGame{
+    display: block;
+    padding: 10px;
 }
