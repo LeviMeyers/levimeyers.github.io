@@ -15,21 +15,29 @@ body {
 
 aside{
     width: 70px;
-    height: 100vh;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     overflow-x: hidden;
     position: fixed;
-    float: left;
     background-color: #434357;
     padding: 15px 0;
 }
 
-/* selected game color: #7ae49d */
 aside a{
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 10px;
     background-color: transparent;
 }
 
+aside a img{
+    width: 100%;
+}
+
+/* want to make selected game pop out 5px or so from aside */
+/* all menu items could also be animated to do this on hover */
 /*#selectedGame{*/
 /*    background-color: #7ae49d;*/
 /*}*/
@@ -39,7 +47,7 @@ aside a:hover{
 }
 
 #main{
-    margin-left: 70px;
+    margin-left: 80px;
     padding: 15px;
 }
 
@@ -48,18 +56,22 @@ aside a:hover{
         top: 0;
         width: 100%;
         height: 70px;
+        flex-direction: row;
         padding: 0 15px;
         overflow-y: hidden;
     }
 
-    aside a{
-        float: right;
-        width: 70px;
-        height: 70px;
+    aside a img{
+        width: auto;
+        height: 100%;
     }
 
     #main{
         margin-left: 0;
         margin-top: 70px;
+    }
+
+    #test{
+        width: 50px;
     }
 }
