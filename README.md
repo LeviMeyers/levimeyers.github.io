@@ -6,7 +6,7 @@ Checklist is currently only for Deltarune (first game on the list). More will be
 - Settings page:
   - Chapter select
   - Unlisted tracks toggle
-  - Modes: multiple choice (+ difficulties), exact name, motifs
+  - Modes: multiple choice (+ difficulties), exact name, motifs, location played
 - Repeatable game round page using data from settings + song info
 - Song info data scraped from mediawiki using REST API
 - Song playback using leveraged bandcamp/spotify widget
