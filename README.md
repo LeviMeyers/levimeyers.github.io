@@ -4,8 +4,8 @@ Early-stage OST guessing game website
 Checklist is currently only for Deltarune (first game on the list). More will be added later
 - <del>Navigation sidebar</del>
 - Settings page:
-  - Chapter select
-  - Unlisted tracks toggle
+  - <del>Chapter select</del>
+  - <del>Unlisted tracks toggle</del>
   - Multiple choice modes: track name, motif, location played
   - Difficulties (multiple choice only): easy, medium, hard
   - Text entry modes: track name, motif
