@@ -8,14 +8,6 @@
     <script src="script.js"></script>
 </head>
 
-<!--
-- Learn HTML/CSS/Javascript
-- Make pages: game selection, rudimentary settings, game page
-- Scrape fandom mediawikis using REST API for song info and music player widgets
-- Make modes: multiple choice, user input, different chapters, unused tracks, motifs, etc.
-- Advanced: gartic-phone type cross-platform multiplayer
--->
-
 <body>
 
 <aside>
@@ -25,12 +17,42 @@
     <a href="undertale.html" title="UNDERTALE">
         <img src="graphics/icon_undertale.png" alt="UNDERTALE">
     </a>
-    <a href="undertale.html" title="Hollow Knight">
+    <a href="hollowknight.html" title="Hollow Knight">
         <img src="graphics/icon_hollowknight.png" alt="Hollow Knight">
     </a>
 </aside>
 
 <div id="main">
+    <form>
+        <div>
+            <p>Include chapters:</p>
+            <div id="chapterList">
+                <label class="checkContainer">1
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="checkContainer">2
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="checkContainer">3
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <span class="checkmark"></span>
+                </label>
+                <label class="checkContainer">4
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+        </div>
+        <div>
+            <p>Include unlisted tracks</p>
+            <label class="switch">
+                <input type="checkbox" id="ulTracksToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </form>
 </div>
 
 </body>

@@ -1,3 +1,8 @@
+:root {
+    --main-grey: #434357;
+    --main-grey-dark: rgb(53 53 69);
+    --accent-green: #7ae49d;
+}
 @font-face {
     font-family: "8bitoperator JVE";
     src: url(graphics/8bitoperator_jve.ttf);
@@ -11,19 +16,35 @@ body {
 * {
     font-family: "8bitoperator JVE", sans-serif;
     font-weight: normal;
+    font-size: 20px;
+    color: white;
+}
+p {
+    margin-top: 0;
+    font-size: 20px;
 }
 
-aside{
+#main {
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 92px;
+    padding: 15px;
+}
+
+aside {
     width: 80px;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    gap: 5px;
     position: fixed;
-    background-color: #434357;
+    background-color: var(--main-grey);
 }
-
-aside a{
+aside a {
     width: 60px;
     display: flex;
     justify-content: center;
@@ -32,52 +53,152 @@ aside a{
     background-color: transparent;
     transition: width 0.2s;
 }
-
-aside a:hover{
-    background-color: rgb(53 53 69);
+aside a:hover {
+    background-color: var(--main-grey-dark);
     width: 90%;
 }
-
-
-aside a img{
+aside a img {
+    user-select: none;
     width: 100%;
 }
-
-#selectedGame{
+#selectedGame {
     width: 90%;
-    background-color: #7ae49d;
+    background-color: var(--accent-green);
 }
 
-#main{
-    margin-left: 80px;
-    padding: 15px;
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 30px;
+    background-color: #434357;
+    border-radius: 2px;
+}
+.switch input {
+    display: none;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: 0.2s;
+    border-radius: 2px;
+}
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    margin: 5px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 2px;
+}
+input:checked + .slider {
+    background-color: var(--accent-green);
+}
+input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+form div {
+    margin: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+form div p {
+    user-select: none;
+}
+
+.checkContainer {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    font-size: 22px;
+    user-select: none;
+}
+.checkContainer input {
+    display: none;
+}
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    border-radius: 2px;
+    background-color: var(--main-grey);
+    transition: 0.2s;
+}
+.checkContainer:hover input ~ .checkmark {
+    background-color: var(--main-grey-dark)
+}
+.checkContainer input:checked ~ .checkmark {
+    background-color: var(--accent-green)
+}
+.checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+.checkContainer input:checked ~ .checkmark::after {
+    display: block;
+}
+.checkContainer .checkmark::after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+#chapterList {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
 }
 
 @media screen and (max-width: 768px){
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #main {
+        margin-left: 0;
+        margin-top: 83px;
+        height: calc(100vh - 83px);
+    }
+
     aside {
         top: 0;
         width: 100%;
         height: 70px;
         flex-direction: row;
     }
-
-    aside a:hover{
+    aside a {
+        height: 50px;
+        transition: height 0.2s;
+    }
+    aside a:hover {
         height: 90%;
         width: auto;
     }
-
-    aside a img{
+    aside a img {
         width: auto;
         height: 100%;
     }
-
-    #selectedGame{
+    #selectedGame {
         height: 90%;
         width: auto;
-    }
-
-    #main{
-        margin-left: 0;
-        margin-top: 70px;
     }
 }
