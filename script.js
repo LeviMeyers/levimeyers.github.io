@@ -1,14 +1,12 @@
 let chapters = [1, 2, 3, 4];
 let unlistedTracks = false;
 
-let mode = "multChoice";
+let mode = "name"; // name; motif; location
+let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 let rounds = 10;
 
 function collectSettings() {
-    const ulTracksInput = document.getElementById("ulTracksToggle")
-    unlistedTracks = ulTracksInput.checked;
-
     chapters = [];
     const chapSelectInputs = document.getElementById("chapterList")
         .getElementsByTagName("input");
@@ -18,8 +16,16 @@ function collectSettings() {
         }
     }
 
-    console.log(unlistedTracks);
+    const ulTracksInput = document.getElementById("ulTracksToggle")
+    unlistedTracks = ulTracksInput.checked;
+
+    const textEntryInput = document.getElementById("entryMode")
+        .getElementsByTagName("input").item(1)
+    isTextEntry = textEntryInput.checked;
+
     console.log(chapters);
+    console.log(unlistedTracks);
+    console.log(isTextEntry);
 }
 
 function maintainChecklist(checklistId, currentCheckbox) {

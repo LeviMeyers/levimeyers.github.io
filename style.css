@@ -2,6 +2,7 @@
     --main-grey: #434357;
     --main-grey-dark: rgb(53 53 69);
     --accent-green: #7ae49d;
+    --white-dark: #cacaca;
 }
 @font-face {
     font-family: "8bitoperator JVE";
@@ -16,22 +17,38 @@ body {
 * {
     font-family: "8bitoperator JVE", sans-serif;
     font-weight: normal;
-    font-size: 20px;
+    font-size: 22px;
     color: white;
 }
 p {
+    font-size: 25px;
     margin-top: 0;
-    font-size: 20px;
 }
 
 #main {
-    height: 100vh;
+    height: 100dvh;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 10px;
     margin-left: 92px;
     padding: 15px;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+}
+form div {
+    margin: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+form div p {
+    user-select: none;
 }
 
 aside {
@@ -104,26 +121,15 @@ input:checked + .slider::before {
     transform: translateX(20px);
 }
 
-form div {
-    margin: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-form div p {
-    user-select: none;
-}
-
-.checkContainer {
+.checkContainer{
     display: block;
     position: relative;
     padding-left: 35px;
     margin-bottom: 15px;
     cursor: pointer;
-    font-size: 22px;
     user-select: none;
 }
-.checkContainer input {
+.checkContainer input{
     display: none;
 }
 .checkmark {
@@ -159,12 +165,50 @@ form div p {
     border-width: 0 3px 3px 0;
     transform: rotate(45deg);
 }
+.radiomark {
+    border-radius: 50%;
+}
+.checkContainer .radiomark::after {
+    top: 8px;
+    left: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: white;
+}
 
-#chapterList {
+button {
+    font-size: 25px;
+    padding: 10px;
+    margin: 10px 10px 15px;
+    cursor: pointer;
+    border: solid white 3px;
+    border-radius: 2px;
+    background-color: var(--main-grey);
+    transition: transform 0.1s linear;
+}
+button:hover {
+    background-color: var(--accent-green);
+    border: solid var(--white-dark) 3px;
+}
+button:active {
+    transform: translateY(2px);
+}
+
+.vertList {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin: 0;
+}
+
+#start {
+    font-size: 50px;
+    height: 80px;
+    width: 320px;
+    margin-bottom: 0;
+    position: absolute;
+    bottom: 10px;
 }
 
 @media screen and (max-width: 768px){

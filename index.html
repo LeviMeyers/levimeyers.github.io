@@ -26,7 +26,7 @@
     <form>
         <div>
             <p>Include chapters:</p>
-            <div id="chapterList">
+            <div class="vertList" id="chapterList">
                 <label class="checkContainer">1
                     <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
                     <span class="checkmark"></span>
@@ -53,6 +53,22 @@
             </label>
         </div>
     </form>
+    <form>
+        <div>
+            <p>Answer mode:</p>
+            <div class="vertList" id="entryMode">
+                <label class="checkContainer">Multiple choice
+                    <input type="radio" name="answerMode" value="multChoice" checked="checked">
+                    <span class="checkmark radiomark"></span>
+                </label>
+                <label class="checkContainer">Text entry
+                    <input type="radio" name="answerMode" value="textEntry">
+                    <span class="checkmark radiomark"></span>
+                </label>
+            </div>
+        </div>
+    </form>
+    <button id="start" onclick="collectSettings()">START</button>
 </div>
 
 </body>
