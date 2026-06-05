@@ -1,7 +1,7 @@
 let chapters = [1, 2, 3, 4];
 let unlistedTracks = false;
 
-let mode = "name"; // name; motif; location
+let mode = "trackName"; // trackName; locationPlayed; motif
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 let rounds = 10;
@@ -11,7 +11,7 @@ function onLoad() {
     const inputs = document.querySelectorAll("input");
     for (const input of inputs) {
         // eventListeners for ALL inputs
-        input.addEventListener("click", checkModesCompatible)
+        input.addEventListener("click", checkModesCompatible);
     }
 }
 document.addEventListener("DOMContentLoaded", onLoad);
@@ -23,19 +23,37 @@ function collectSettings() {
         .getElementsByTagName("input");
     for (const input of chapSelectInputs) {
         if (input.checked) {
-            chapters.push(Number(input.parentElement.textContent))
+            chapters.push(Number(input.parentElement.textContent));
         }
     }
 
-    const ulTracksInput = document.getElementById("ulTracksToggle")
-    unlistedTracks = ulTracksInput.checked;
+    const ulTracks = document.getElementById("ulTracksToggle");
+    unlistedTracks = ulTracks.checked;
 
-    const textEntryInput = document.querySelector("input[value=textEntry]")
-    isTextEntry = textEntryInput.checked;
+    const textEntry = document.querySelector("input[value=textEntry]");
+    isTextEntry = textEntry.checked;
+
+    const modeInput = document.querySelector("input[name=quizMode]:checked");
+    mode = modeInput.value;
+
+    const diff = document.querySelector("input[name=difficulty]:checked");
+    switch(diff) {
+        case "easy":
+            difficulty = 0;
+            break;
+        case "medium":
+            difficulty = 1;
+            break;
+        case "hard":
+            difficulty = 2;
+            break;
+    }
 
     console.log(chapters);
     console.log(unlistedTracks);
     console.log(isTextEntry);
+    console.log(mode);
+    console.log(difficulty);
 }
 
 function maintainChecklist(checklistId, currentCheckbox) {

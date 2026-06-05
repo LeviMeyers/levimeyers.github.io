@@ -26,7 +26,7 @@ p {
 }
 
 .main {
-    height: 100dvh;
+    min-height: 100vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -34,7 +34,7 @@ p {
     align-items: center;
     gap: 10px;
     margin-left: 80px;
-    padding: 15px;
+    padding: 15px 15px 100px;
     background-color: #131136;
     background-image: url(graphics/bg_deltarune.png);
     background-attachment: fixed;
@@ -70,11 +70,12 @@ form div {
 aside {
     width: 80px;
     height: 100%;
+    gap: 5px;
+    position: fixed;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 5px;
-    position: fixed;
+    z-index: 20;
     background-color: var(--main-grey);
     box-shadow: 20px 0 40px 19px rgba(0, 0, 0, 0.30);
 }
@@ -232,11 +233,20 @@ button:active {
 
 #start {
     font-size: 50px;
-    height: 80px;
-    width: 320px;
+    max-height: 80px;
+    max-width: 320px;
+    min-width: 270px;
     margin-bottom: 0;
-    position: absolute;
+    position: fixed;
     bottom: 10px;
+    box-shadow: 0 0 35px 8px rgba(0, 0, 0, 0.40);
+}
+
+small {
+    position: fixed;
+    bottom: 5px;
+    right: 6px;
+    opacity: 0.4;
 }
 
 /* ^^ UNIVERSAL ^^ */
@@ -246,6 +256,7 @@ button:active {
     gap: 30px;
 }
 
+/* General mobile responsivity */
 @media screen and (max-width: 768px){
     body {
         display: flex;
@@ -255,10 +266,11 @@ button:active {
     .main {
         margin-left: 0;
         margin-top: 70px;
-        height: calc(100vh - 70px);
+        padding-top: 25px;
     }
 
     aside {
+        position: fixed;
         top: 0;
         width: 100%;
         height: 70px;
@@ -280,5 +292,11 @@ button:active {
     #selectedGame {
         height: 90%;
         width: auto;
+    }
+}
+/* Background caption breakpoint */
+@media screen and (max-width: 1000px) {
+    small {
+        display: none;
     }
 }

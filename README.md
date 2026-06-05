@@ -2,13 +2,13 @@
 Early-stage OST guessing game website
 
 Checklist is currently only for Deltarune (first game on the list). More will be added later
-- <del>Navigation sidebar</del>
+- <del>Navigation sidebar
 - Settings page:
-  - <del>Chapter select</del>
-  - <del>Unlisted tracks toggle</del>
-  - Multiple choice modes: track name, motif, location played
-  - Difficulties (multiple choice only): easy, medium, hard
-  - Text entry modes: track name, motif
+  - <del>Chapter select
+  - <del>Unlisted tracks toggle
+  - <del>Multiple choice modes: track name, motif, location played
+  - <del>Difficulties (multiple choice only): easy, medium, hard
+  - <del>Text entry modes: track name, motif
   - Number of rounds
 - Repeatable game round page using data from settings + song info
 - Song info data scraped from mediawiki using REST API
