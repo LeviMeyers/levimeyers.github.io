@@ -22,7 +22,7 @@
     </a>
 </aside>
 
-<div id="main">
+<div class="main" id="deltarune">
     <form>
         <div>
             <p>Include chapters:</p>
@@ -63,6 +63,40 @@
                 </label>
                 <label class="checkContainer">Text entry
                     <input type="radio" name="answerMode" value="textEntry">
+                    <span class="checkmark radiomark"></span>
+                </label>
+            </div>
+        </div>
+        <div>
+            <p>Question mode:</p>
+            <div class="vertList" id="quizMode">
+                <label class="checkContainer">Track name
+                    <input type="radio" name="quizMode" value="trackName" checked="checked">
+                    <span class="checkmark radiomark"></span>
+                </label>
+                <label class="checkContainer">Location played
+                    <input type="radio" name="quizMode" value="locationPlayed">
+                    <span class="checkmark radiomark"></span>
+                </label>
+                <label class="checkContainer">Motif
+                    <input type="radio" name="quizMode" value="motif">
+                    <span class="checkmark radiomark"></span>
+                </label>
+            </div>
+        </div>
+        <div id="diffWrapper">
+            <p>Difficulty:</p>
+            <div class="vertList" id="difficulty">
+                <label class="checkContainer">Easy
+                    <input type="radio" name="difficulty" value="easy">
+                    <span class="checkmark radiomark"></span>
+                </label>
+                <label class="checkContainer">Medium
+                    <input type="radio" name="difficulty" value="medium" checked="checked">
+                    <span class="checkmark radiomark"></span>
+                </label>
+                <label class="checkContainer">Hard
+                    <input type="radio" name="difficulty" value="hard">
                     <span class="checkmark radiomark"></span>
                 </label>
             </div>
