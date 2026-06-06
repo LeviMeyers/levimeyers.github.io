@@ -37,7 +37,7 @@ function collectSettings() {
     mode = modeInput.value;
 
     const diff = document.querySelector("input[name=difficulty]:checked");
-    switch(diff.value) {
+    switch(diff) {
         case "easy":
             difficulty = 0;
             break;
