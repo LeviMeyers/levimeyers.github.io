@@ -10,8 +10,10 @@
 }
 
 body {
-    background-color: #101014;
     margin: 0;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 * {
@@ -35,9 +37,6 @@ p {
     gap: 10px;
     margin-left: 80px;
     padding: 15px 15px 100px;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-size: cover;
 }
 
 form {
@@ -252,11 +251,6 @@ small {
 #chapterList {
     flex-direction: row;
     gap: 30px;
-}
-
-#deltarune {
-    background-color: #131136;
-    background-image: url(graphics/bg_deltarune.png);
 }
 
 /* General mobile responsivity */
