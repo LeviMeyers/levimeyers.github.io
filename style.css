@@ -14,7 +14,6 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     margin: 0;
-    transition: background-image;
 }
 
 * {
@@ -259,7 +258,6 @@ small {
     body {
         display: flex;
         flex-direction: column;
-        background-image: none;
     }
 
     .main {
@@ -291,10 +289,6 @@ small {
     #selectedGame {
         height: 90%;
         width: auto;
-    }
-
-    small {
-        display: none;
     }
 }
 /* Background caption breakpoint */
