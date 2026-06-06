@@ -35,8 +35,6 @@ p {
     gap: 10px;
     margin-left: 80px;
     padding: 15px 15px 100px;
-    background-color: #131136;
-    background-image: url(graphics/bg_deltarune.png);
     background-attachment: fixed;
     background-repeat: no-repeat;
     background-size: cover;
@@ -254,6 +252,11 @@ small {
 #chapterList {
     flex-direction: row;
     gap: 30px;
+}
+
+#deltarune {
+    background-color: #131136;
+    background-image: url(graphics/bg_deltarune.png);
 }
 
 /* General mobile responsivity */
