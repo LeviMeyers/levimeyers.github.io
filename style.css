@@ -10,10 +10,8 @@
 }
 
 body {
+    background-color: #101014;
     margin: 0;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-size: cover;
 }
 
 * {
@@ -37,6 +35,9 @@ p {
     gap: 10px;
     margin-left: 80px;
     padding: 15px 15px 100px;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 form {
@@ -196,7 +197,7 @@ input:checked + .slider::before {
 button {
     font-size: 25px;
     padding: 10px;
-    margin: 10px 10px 15px;
+    margin: 10px;
     cursor: pointer;
     border: solid white 5px;
     border-radius: 2px;
@@ -206,8 +207,42 @@ button {
 button:hover {
     background-color: var(--accent-green);
 }
-button:active {
+div.numController {
+    flex-direction: row;
+    background: transparent;
+    padding: 0;
+}
+button.numController {
+    position: relative;
+    height: 40px;
+    width: 40px;
+    border: none;
+    border-radius: 50%;
+}
+button.numController::after {
+    content: "";
+    position: absolute;
+    top: 12px;
+    width: 12px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 5px 5px 0;
+}
+button[value="decrease"]::after {
+    left: 14px;
+    transform: rotate(-225deg)
+}
+button[value="increase"]::after {
+    left: 10px;
+    transform: rotate(-45deg);
+}
+button.numController:active {
     transform: translateY(2px);
+}
+span.numController {
+    width: 40px;
+    font-size: 40px;
+    text-align: center;
 }
 
 .vertList {
@@ -238,6 +273,9 @@ button:active {
     bottom: 10px;
     box-shadow: 0 0 35px 8px rgba(0, 0, 0, 0.40);
 }
+#start:active {
+    transform: translateY(2px);
+}
 
 small {
     position: fixed;
@@ -253,6 +291,11 @@ small {
     gap: 30px;
 }
 
+#deltarune {
+    background-color: #131136;
+    background-image: url(graphics/bg_deltarune.png);
+}
+
 /* General mobile responsivity */
 @media screen and (max-width: 768px){
     body {
@@ -263,7 +306,7 @@ small {
     .main {
         margin-left: 0;
         margin-top: 70px;
-        padding-top: 25px;
+        padding-top: 20px;
     }
 
     aside {
@@ -289,6 +332,10 @@ small {
     #selectedGame {
         height: 90%;
         width: auto;
+    }
+
+    #deltarune {
+        background-image: none;
     }
 }
 /* Background caption breakpoint */

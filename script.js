@@ -8,9 +8,9 @@ let rounds = 10;
 
 // runs on page load (mostly eventListener assignments)
 function onLoad() {
-    const inputs = document.querySelectorAll("input");
-    for (const input of inputs) {
-        // eventListeners for ALL inputs
+    const modeInputs = document.getElementsByTagName("form").item(1)
+        .getElementsByTagName("input");
+    for (const input of modeInputs) {
         input.addEventListener("click", checkModesCompatible);
     }
 }

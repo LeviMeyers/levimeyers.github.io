@@ -102,7 +102,17 @@
             </div>
         </div>
     </form>
-    <button id="start" onclick="collectSettings()">START</button>
+    <form>
+        <div>
+            <p>Rounds:</p>
+            <div class="numController">
+                <button type="button" class="numController" value="decrease"></button>
+                <span class="numController" id="rounds">10</span>
+                <button type="button" class="numController" value="increase"></button>
+            </div>
+        </div>
+    </form>
+    <button id="start" onclick="collectSettings()" type="submit">START</button>
     <small>Concept artwork by Temmie Chang</small>
 </div>
 
