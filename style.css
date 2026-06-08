@@ -10,7 +10,6 @@
 }
 
 body {
-    background-color: #101014;
     margin: 0;
 }
 
@@ -292,7 +291,6 @@ small {
 }
 
 #deltarune {
-    background-color: #131136;
     background-image: url(graphics/bg_deltarune.png);
 }
 
@@ -307,6 +305,9 @@ small {
         margin-left: 0;
         margin-top: 70px;
         padding-top: 20px;
+    }
+    #deltarune {
+        background-image: none;
     }
 
     aside {
@@ -332,10 +333,6 @@ small {
     #selectedGame {
         height: 90%;
         width: auto;
-    }
-
-    #deltarune {
-        background-image: none;
     }
 }
 /* Background caption breakpoint */
