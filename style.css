@@ -2,6 +2,7 @@
     --main-grey: #434357;
     --main-grey-dark: rgb(53 53 69);
     --accent-green: #7ae49d;
+    --accent-green-dark: #69c989;
     --white-dark: #cacaca;
 }
 @font-face {
@@ -201,11 +202,16 @@ button {
     border: solid white 5px;
     border-radius: 2px;
     background-color: var(--main-grey);
-    transition: transform 0.1s linear;
+    transition: transform 0.1s linear, background-color 0.2s;
 }
 button:hover {
+    transition: transform 0.1s linear, background-color 0s;
     background-color: var(--accent-green);
 }
+button:active {
+    background-color: var(--accent-green-dark);
+}
+
 div.numController {
     flex-direction: row;
     background: transparent;
@@ -239,7 +245,7 @@ button.numController:active {
     transform: translateY(2px);
 }
 span.numController {
-    width: 40px;
+    width: 50px;
     font-size: 40px;
     text-align: center;
 }

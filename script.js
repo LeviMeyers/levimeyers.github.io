@@ -49,11 +49,14 @@ function collectSettings() {
             break;
     }
 
+    rounds = Number(document.getElementById("rounds").textContent);
+
     console.log(chapters);
     console.log(unlistedTracks);
     console.log(isTextEntry);
     console.log(mode);
     console.log(difficulty);
+    console.log(rounds);
 }
 
 function maintainChecklist(checklistId, currentCheckbox) {
@@ -89,5 +92,28 @@ function checkModesCompatible() {
         }
     } else {
         locationPlayed.disabled = false;
+    }
+}
+
+// decreaseButton: this
+// increment: bool = true if increasing number, false if decreasing
+// step: number = how much to increment/decrement by
+// floor: number = minimum value
+// ceiling: number = maximum value
+function numController(decreaseButton, increment, step, floor, ceiling) {
+    if (increment) {
+        const numberElement = decreaseButton.previousElementSibling;
+        const number = Number(numberElement.textContent);
+
+        if ((number + step) <= ceiling) {
+            numberElement.textContent = String(number + step);
+        }
+    } else {
+        const numberElement = decreaseButton.nextElementSibling;
+        const number = Number(numberElement.textContent);
+
+        if ((number - step) >= floor) {
+            numberElement.textContent = String(number - step);
+        }
     }
 }
