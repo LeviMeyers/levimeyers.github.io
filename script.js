@@ -16,6 +16,9 @@ function onLoad() {
 }
 document.addEventListener("DOMContentLoaded", onLoad);
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function collectSettings() {
     chapters = [];
@@ -95,25 +98,34 @@ function checkModesCompatible() {
     }
 }
 
-// decreaseButton: this
+// button: this
 // increment: bool = true if increasing number, false if decreasing
 // step: number = how much to increment/decrement by
 // floor: number = minimum value
 // ceiling: number = maximum value
-function numController(decreaseButton, increment, step, floor, ceiling) {
+function numController(button, increment, step, floor, ceiling) {
     if (increment) {
-        const numberElement = decreaseButton.previousElementSibling;
+        const numberElement = button.previousElementSibling;
         const number = Number(numberElement.textContent);
 
         if ((number + step) <= ceiling) {
-            numberElement.textContent = String(number + step);
+            modifyNum(numberElement, (number + step));
         }
     } else {
-        const numberElement = decreaseButton.nextElementSibling;
+        const numberElement = button.nextElementSibling;
         const number = Number(numberElement.textContent);
 
         if ((number - step) >= floor) {
-            numberElement.textContent = String(number - step);
+            modifyNum(numberElement, (number - step));
         }
     }
+}
+
+function modifyNum(numElement, newValue) {
+    numElement.classList.remove("nudgeAnim");
+    void numElement.offsetWidth;
+
+    numElement.textContent = String(newValue)
+
+    numElement.classList.add("nudgeAnim");
 }
