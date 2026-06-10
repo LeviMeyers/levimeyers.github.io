@@ -9,7 +9,7 @@ Checklist is currently only for Deltarune (first game on the list). More will be
   - <del>Multiple choice modes: track name, motif, location played
   - <del>Difficulties (multiple choice only): easy, medium, hard
   - <del>Text entry modes: track name, motif
-  - Number of rounds
+  - <del>Number of rounds
 - Repeatable game round page using data from settings + song info
 - Song info data scraped from mediawiki using REST API
 - Song playback using leveraged bandcamp/spotify widget
