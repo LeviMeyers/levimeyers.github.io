@@ -125,7 +125,24 @@ function modifyNum(numElement, newValue) {
     numElement.classList.remove("nudgeAnim");
     void numElement.offsetWidth;
 
-    numElement.textContent = String(newValue)
+    numElement.textContent = String(newValue);
 
     numElement.classList.add("nudgeAnim");
+}
+
+function nowPlayingLoop() {
+    const playingElement = document.getElementById("playingStatus")
+    const playingContent = playingElement.textContent;
+
+    switch (playingContent) {
+        default:
+        case "Now playing...":
+            playingElement.textContent = "Now playing.";
+            break;
+        case "Now playing.":
+            playingElement.textContent = "Now playing..";
+            break;
+        case "Now playing..":
+            playingElement.textContent = "Now playing...";
+    }
 }

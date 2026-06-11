@@ -14,57 +14,6 @@ body {
     margin: 0;
 }
 
-* {
-    font-family: "8bitoperator JVE", sans-serif;
-    font-weight: normal;
-    font-size: 22px;
-    color: white;
-}
-p {
-    font-size: 25px;
-    margin-top: 0;
-}
-
-.main {
-    min-height: 100vh;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-left: 80px;
-    padding: 15px 15px 100px;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-form {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-form div {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgb(0 0 0 / 0.80);
-    border-radius: 2px;
-    transition: 0.2s ease-out;
-}
-#diffWrapper {
-    transition: 0.2s ease-out;
-}
-#diffWrapper[hidden] {
-    max-width: 0;
-    overflow: hidden;
-    padding: 0;
-}
-
 aside {
     width: 80px;
     height: 100%;
@@ -84,7 +33,7 @@ aside a {
     align-items: center;
     padding: 10px;
     background-color: transparent;
-    border-radius: 2px;
+    border-radius: 0 2px 2px 0;
     transition: width 0.2s;
 }
 aside a:hover {
@@ -98,6 +47,92 @@ aside a img {
 #selectedGame {
     width: 90%;
     background-color: var(--accent-green);
+}
+
+* {
+    font-family: "8bitoperator JVE", sans-serif;
+    font-weight: normal;
+    font-size: 25px;
+    color: white;
+}
+p {
+    text-align: center;
+    margin-top: 0;
+}
+#prompt {
+    margin-bottom: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    font-size: min(60px, 13.5vw);
+}
+
+.main {
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-left: 80px;
+    padding: 15px 15px 15px 25px;
+    background-color: transparent;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 0;
+}
+
+.settings {
+    display: none;
+    padding-bottom: 100px;
+}
+
+.game {
+    /*display: none;*/
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+div {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(0 0 0 / 0.80);
+    border-radius: 2px;
+    transition: max-height 0.2s ease-out;
+}
+#diffWrapper {
+    transition: 0.2s ease-out;
+}
+#diffWrapper[hidden] {
+    max-width: 0;
+    overflow: hidden;
+    padding: 0;
+}
+#infoDiv {
+    padding: min(20px, 5%);
+    width: min(700px, 90%);
+}
+#infoDiv h1 {
+    height: 2em;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    color: transparent;
+    background: linear-gradient(to top, #b4b5bd, var(--accent-green));
+    background-clip: text;
+    filter: drop-shadow(2px 3px 0 #232460);
 }
 
 .switch {
@@ -195,11 +230,11 @@ input:checked + .slider::before {
 }
 
 button {
-    font-size: 25px;
+    text-align: center;
     padding: 10px;
     margin: 10px;
     cursor: pointer;
-    border: solid white 5px;
+    border: solid white 3px;
     border-radius: 2px;
     background-color: var(--main-grey);
     transition: transform 0.1s linear, background-color 0.2s;
@@ -273,6 +308,7 @@ span.numController {
     max-height: 80px;
     max-width: 320px;
     min-width: 270px;
+    border: solid white 5px;
     margin-bottom: 0;
     position: fixed;
     bottom: 10px;
@@ -312,7 +348,7 @@ small {
     gap: 30px;
 }
 
-#deltarune {
+.deltarune {
     background-image: url(graphics/bg_deltarune.png);
 }
 
@@ -321,15 +357,6 @@ small {
     body {
         display: flex;
         flex-direction: column;
-    }
-
-    .main {
-        margin-left: 0;
-        margin-top: 70px;
-        padding-top: 20px;
-    }
-    #deltarune {
-        background-image: none;
     }
 
     aside {
@@ -355,6 +382,19 @@ small {
     #selectedGame {
         height: 90%;
         width: auto;
+    }
+
+    .main {
+        margin-left: 0;
+        padding-top: 90px;
+    }
+
+    #infoDiv h1 {
+        height: auto;
+    }
+
+    .deltarune {
+        background-image: none;
     }
 }
 /* Background caption breakpoint */

@@ -17,6 +17,8 @@ Checklist is currently only for Deltarune (first game on the list). More will be
   - Multiple choice: 3+ buttons, answer feedback on buttons after clicked
   - Text entry: entry box, answer feedback above after clicked
   - Non-case sensitive disclaimer
+  - Timing function + points scored
+  - Next button
 - Song info data scraped from mediawiki using REST API
 - Song playback using leveraged bandcamp/spotify widget
 - Get unlisted tracks manually(?)

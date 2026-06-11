@@ -22,7 +22,7 @@
     </a>
 </aside>
 
-<div class="main" id="deltarune">
+<div class="main settings deltarune">
     <form>
         <div>
             <p>Include chapters:</p>
@@ -115,8 +115,17 @@
         </div>
     </form>
     <button id="start" onclick="collectSettings()" type="submit">START</button>
-    <small>Concept artwork by Temmie Chang</small>
 </div>
+
+<div class="main game deltarune">
+    <div id="infoDiv">
+        <p id="playingStatus">Get ready!</p>
+        <h1>???</h1>
+        <p id="prompt">What is the name of this track?</p>
+    </div>
+    <button onclick="setInterval(nowPlayingLoop, 500)">TEST</button>
+</div>
+<small>Concept artwork by Temmie Chang</small>
 
 </body>
 </html>
