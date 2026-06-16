@@ -114,16 +114,22 @@
             </div>
         </div>
     </form>
-    <button id="start" onclick="collectSettings()" type="submit">START</button>
+    <button class="next" onclick="collectSettings()" type="submit">START</button>
 </div>
 
 <div class="main game deltarune">
     <div id="infoDiv">
         <p id="playingStatus">Get ready!</p>
         <h1>???</h1>
+        <div id="countdown"><span>3</span><span>2</span><span>1</span></div>
         <p id="prompt">What is the name of this track?</p>
     </div>
-    <button onclick="setInterval(nowPlayingLoop, 500)">TEST</button>
+    <div id="multChoiceAnswers">
+        <button onclick="countdownAnim()">Answer 1</button>
+        <button>Answer 2</button>
+        <button>Answer 3</button>
+    </div>
+    <button class="next" type="submit" hidden>NEXT</button>
 </div>
 <small>Concept artwork by Temmie Chang</small>
 

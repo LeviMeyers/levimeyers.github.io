@@ -130,6 +130,8 @@ function modifyNum(numElement, newValue) {
     numElement.classList.add("nudgeAnim");
 }
 
+// when implemented, call once before using setInterval to avoid 500 ms delay
+// nowPlayingLoop; setInterval(nowPlayingLoop, 500);
 function nowPlayingLoop() {
     const playingElement = document.getElementById("playingStatus")
     const playingContent = playingElement.textContent;
@@ -145,4 +147,21 @@ function nowPlayingLoop() {
         case "Now playing..":
             playingElement.textContent = "Now playing...";
     }
+}
+
+async function countdownAnim() {
+    const countdownDiv = document.getElementById("countdown");
+    const numbers = countdownDiv.children;
+    const trackName = countdownDiv.previousElementSibling;
+
+    await sleep(1000);
+
+    for (const num of numbers) {
+        num.style.color = "white";
+        num.style.textShadow = "0px 0px 10px rgba(255,255,255,0.5)";
+        await sleep(1000);
+    }
+
+    countdownDiv.style.display = "none";
+    trackName.style.display = "block";
 }

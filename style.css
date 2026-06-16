@@ -1,5 +1,5 @@
 :root {
-    --main-grey: #434357;
+    --main-grey: rgb(67 67 87);
     --main-grey-dark: rgb(53 53 69);
     --accent-green: #7ae49d;
     --accent-green-dark: #69c989;
@@ -56,18 +56,32 @@ aside a img {
     color: white;
 }
 p {
+    max-height: 200px;
+    display: block;
     text-align: center;
     margin-top: 0;
+    transition: 0.2s ease-out;
+}
+p[hidden] {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    border: none;
 }
 #prompt {
+    margin-top: 30px;
     margin-bottom: 0;
+}
+#prompt[hidden] {
+    margin: 0;
 }
 
 h1 {
     text-align: center;
     margin-top: 0;
-    margin-bottom: 0.5em;
-    font-size: min(60px, 13.5vw);
+    margin-bottom: 0;
+    font-size: clamp(45px, 13.5vw, 60px);
 }
 
 .main {
@@ -110,29 +124,31 @@ div {
     justify-content: center;
     background-color: rgb(0 0 0 / 0.80);
     border-radius: 2px;
-    transition: max-height 0.2s ease-out;
+    transition: max-height 0.2s ease-out, padding 0.2s ease-out;
 }
-#diffWrapper {
-    transition: 0.2s ease-out;
-}
-#diffWrapper[hidden] {
+div[hidden] {
     max-width: 0;
     overflow: hidden;
     padding: 0;
 }
 #infoDiv {
+    display: block;
     padding: min(20px, 5%);
     width: min(700px, 90%);
 }
 #infoDiv h1 {
-    height: 2em;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    display: none;
+    justify-self: center;
     color: transparent;
-    background: linear-gradient(to top, #b4b5bd, var(--accent-green));
+    background: linear-gradient(to top, #d6d6a7, #dfdf4f);
     background-clip: text;
-    filter: drop-shadow(2px 3px 0 #232460);
+    filter: drop-shadow(0 0 10px rgb(214 214 146 / 0.75));
+}
+/*#infoDiv h1.revealed {*/
+/*    color: #dfdf4f;*/
+/*}*/
+#infoDiv p {
+    font-size: 27px;
 }
 
 .switch {
@@ -230,21 +246,30 @@ input:checked + .slider::before {
 }
 
 button {
+    display: block;
     text-align: center;
     padding: 10px;
     margin: 10px;
     cursor: pointer;
     border: solid white 3px;
     border-radius: 2px;
-    background-color: var(--main-grey);
-    transition: transform 0.1s linear, background-color 0.2s;
+    background-color: rgb(0 0 0 / 0.80);
+    transition: transform 0.1s linear, background-color 0.2s, padding 0.2s ease-out;
 }
 button:hover {
-    transition: transform 0.1s linear, background-color 0s;
-    background-color: var(--accent-green);
+    transition: transform 0.1s linear, background-color 0.2s, padding 0.2s ease-out;
+    background-color: black;
 }
 button:active {
+    transform: translateY(2px);
     background-color: var(--accent-green-dark);
+}
+button[hidden] {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    border: none;
 }
 
 div.numController {
@@ -303,19 +328,33 @@ span.numController {
     margin: 0;
 }
 
-#start {
+.next {
     font-size: 50px;
     max-height: 80px;
     max-width: 320px;
     min-width: 270px;
     border: solid white 5px;
+    background-color: var(--main-grey);
     margin-bottom: 0;
     position: fixed;
     bottom: 10px;
     box-shadow: 0 0 35px 8px rgba(0, 0, 0, 0.40);
 }
-#start:active {
-    transform: translateY(2px);
+.next:hover {
+    color: white;
+    border: solid white 5px;
+    background-color: var(--accent-green);
+    transition: transform 0.1s linear, background-color 0s;
+}
+.next:active {
+    background-color: var(--accent-green-dark);
+}
+.next[hidden] {
+    max-width: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    border: none;
 }
 
 small {
@@ -339,6 +378,29 @@ small {
 
 .nudgeAnim {
     animation: 0.1s nudge ease-out;
+}
+
+#multChoiceAnswers {
+    background: transparent;
+    padding-top: 5px;
+    width: min(500px, 80%);
+}
+#multChoiceAnswers button {
+    margin-top: 0;
+    width: 100%;
+}
+
+#countdown {
+    background: transparent;
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    padding: 0;
+}
+#countdown span {
+    color: var(--main-grey-dark);
+    font-size: clamp(45px, 13.5vw, 60px);
+    transition: 0.2s;
 }
 
 /* ^^ UNIVERSAL ^^ */
@@ -387,6 +449,13 @@ small {
     .main {
         margin-left: 0;
         padding-top: 90px;
+    }
+
+    div[hidden] {
+        max-width: 1000000px;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0;
     }
 
     #infoDiv h1 {
