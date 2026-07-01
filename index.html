@@ -14,12 +14,15 @@
     <a href="deltarune.html" title="DELTARUNE" id=selectedGame>
         <img src="graphics/icon_deltarune.png" alt="DELTARUNE">
     </a>
-    <a href="undertale.html" title="UNDERTALE">
-        <img src="graphics/icon_undertale.png" alt="UNDERTALE">
-    </a>
-    <a href="hollowknight.html" title="Hollow Knight">
-        <img src="graphics/icon_hollowknight.png" alt="Hollow Knight">
-    </a>
+<!--    <a href="undertale.html" title="UNDERTALE">-->
+<!--        <img src="graphics/icon_undertale.png" alt="UNDERTALE">-->
+<!--    </a>-->
+<!--    <a href="hollowknight.html" title="Hollow Knight">-->
+<!--        <img src="graphics/icon_hollowknight.png" alt="Hollow Knight">-->
+<!--    </a>-->
+<!--    <a href="ultrakill.html" title="ULTRAKILL">-->
+<!--        <img src="graphics/icon_ultrakill.png" alt="ULTRAKILL">-->
+<!--    </a>-->
 </aside>
 
 <div class="main settings deltarune">
@@ -124,12 +127,17 @@
         <div id="countdown"><span>3</span><span>2</span><span>1</span></div>
         <p id="prompt">What is the name of this track?</p>
     </div>
-    <div id="multChoiceAnswers">
-        <button onclick="countdownAnim()">Answer 1</button>
+    <div id="answers">
+        <button>Answer 1</button>
         <button>Answer 2</button>
         <button>Answer 3</button>
+<!--        when switching to text entry, set display: block manually and use element.focus() -->
+        <label id="gameTextEntry" style="display: none">
+            <textarea autocomplete="off" spellcheck="false" placeholder="Type answer here..."></textarea>
+            <button onclick="collectTextInput()"></button>
+        </label>
     </div>
-    <button class="next" type="submit" hidden>NEXT</button>
+    <button class="next" hidden>NEXT</button>
 </div>
 <small>Concept artwork by Temmie Chang</small>
 

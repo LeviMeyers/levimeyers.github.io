@@ -1,10 +1,11 @@
-let chapters = [1, 2, 3, 4];
-let unlistedTracks = false;
+// UNIVERSAL
 
-let mode = "trackName"; // trackName; locationPlayed; motif
+let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 let rounds = 10;
+
+let textInput;
 
 // runs on page load (mostly eventListener assignments)
 function onLoad() {
@@ -12,6 +13,24 @@ function onLoad() {
         .getElementsByTagName("input");
     for (const input of modeInputs) {
         input.addEventListener("click", checkModesCompatible);
+    }
+
+    const textAreas = document.getElementsByTagName("textarea");
+    for (const input of textAreas) {
+        input.addEventListener("keydown", event => {
+            if (event.code === "Enter") {
+                event.preventDefault();
+
+                if (input.parentElement.id === "gameTextEntry") {
+                    input.nextElementSibling.click();
+                    input.nextElementSibling.focus();
+                }
+            }
+        })
+        input.addEventListener("input", function() {
+            this.style.height = "1em";
+            this.style.height = this.scrollHeight - 20 + "px";
+        })
     }
 }
 document.addEventListener("DOMContentLoaded", onLoad);
@@ -165,3 +184,14 @@ async function countdownAnim() {
     countdownDiv.style.display = "none";
     trackName.style.display = "block";
 }
+
+function collectTextInput() {
+    const inputArea = document.querySelector("#gameTextEntry textarea");
+
+    textInput = inputArea.value;
+}
+
+// GAME-SPECIFIC
+
+let chapters = [1, 2, 3, 4];
+let unlistedTracks = false;
