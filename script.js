@@ -103,8 +103,7 @@ function checkModesCompatible() {
     const locationPlayed = document.querySelector("input[value=locationPlayed]")
     const trackName = document.querySelector("input[value=trackName]")
     const difficultyDiv = document.getElementById("diffWrapper");
-
-    difficultyDiv.hidden = !trackName.checked; // if track name not selected, hide difficulty selector
+    const spoilerWarning = document.getElementById("spoilerWarning");
 
     if (textEntry.checked) {
         locationPlayed.disabled = true;
@@ -115,6 +114,13 @@ function checkModesCompatible() {
     } else {
         locationPlayed.disabled = false;
     }
+
+    if (!trackName.checked || textEntry.checked) {
+        difficultyDiv.hidden = true;
+    } else {
+        difficultyDiv.hidden = false;
+    }
+    spoilerWarning.hidden = !locationPlayed.checked; // if location played is selected, show spoiler warning
 }
 
 // button: this
@@ -167,6 +173,7 @@ function nowPlayingLoop() {
             playingElement.textContent = "Now playing...";
     }
 }
+// <p id="playingStatus">Get ready!</p>
 
 async function countdownAnim() {
     const countdownDiv = document.getElementById("countdown");
@@ -184,6 +191,7 @@ async function countdownAnim() {
     countdownDiv.style.display = "none";
     trackName.style.display = "block";
 }
+// <div id="countdown"><span>3</span><span>2</span><span>1</span></div>
 
 function collectTextInput() {
     const inputArea = document.querySelector("#gameTextEntry textarea");
@@ -191,7 +199,17 @@ function collectTextInput() {
     textInput = inputArea.value;
 }
 
+async function testSwap() {
+    const trackHeader = document.querySelector("#infoDiv h1")
+    const prompt = document.querySelector("#infoDiv p")
+
+    prompt.hidden = !prompt.hidden;
+    await sleep(150);
+    trackHeader.hidden = !trackHeader.hidden;
+}
+
 // GAME-SPECIFIC
 
-let chapters = [1, 2, 3, 4];
+let chapters = [1, 2, 3, 4]; // will (probably????) be using acts for ULTRAKILL which are also just numbers
+                                      // so maybe not game-specific?
 let unlistedTracks = false;

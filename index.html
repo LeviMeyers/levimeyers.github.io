@@ -104,6 +104,10 @@
                 </label>
             </div>
         </div>
+        <div id="spoilerWarning" hidden>
+            <p style="color:var(--soft-red); margin-bottom: 20px">SPOILER WARNING</p>
+            <p style="margin-bottom: 0">Reused tracks may show their locations in unselected chapters</p>
+        </div>
     </form>
     <form>
         <div>
@@ -122,13 +126,16 @@
 
 <div class="main game deltarune">
     <div id="infoDiv">
-        <p id="playingStatus">Get ready!</p>
-        <h1>???</h1>
-        <div id="countdown"><span>3</span><span>2</span><span>1</span></div>
+        <h1 hidden>Track Name</h1>
+        <div style="background-color: #333333; width: 80px;">
+            <iframe class="embedPlayer"
+                    src="https://bandcamp.com/EmbeddedPlayer/album=4122870521/size=small/bgcol=333333/linkcol=4ec5ec/artwork=none/track=4079358039/transparent=true/">
+            </iframe>
+        </div>
         <p id="prompt">What is the name of this track?</p>
     </div>
     <div id="answers">
-        <button>Answer 1</button>
+        <button onclick="testSwap()">Answer 1</button>
         <button>Answer 2</button>
         <button>Answer 3</button>
 <!--        when switching to text entry, set display: block manually and use element.focus() -->

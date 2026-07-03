@@ -79,11 +79,18 @@ p[hidden] {
 }
 
 h1 {
+    display: block;
     text-align: center;
     margin-top: 0;
-    margin-bottom: 0;
+    margin-bottom: 0.5em;
     font-size: clamp(45px, 13.5vw, 60px);
-    transition: 0.2s;
+    max-height: 500px;
+    transition: 0.2s ease-out;
+}
+h1[hidden] {
+    max-height: 0;
+    overflow: hidden;
+    margin: 0;
 }
 
 .main {
@@ -129,23 +136,18 @@ div {
     transition: max-height 0.2s ease-out, padding 0.2s ease-out;
 }
 div[hidden] {
-    max-width: 0;
+    max-width: 0 !important;
     overflow: hidden;
     padding: 0;
 }
 #infoDiv {
-    display: block;
+    display: flex;
+    justify-content: center;
     padding: min(20px, 5%);
     width: min(700px, 90%);
 }
 #infoDiv h1 {
-    display: none;
     justify-self: center;
-    color: transparent;
-    background: linear-gradient(to top, #d6d6a7, white);
-    background-clip: text;
-}
-#infoDiv h1.revealed {
     color: transparent;
     background: linear-gradient(to top, #d6d6a7, #dfdf4f);
     background-clip: text;
@@ -489,6 +491,22 @@ small {
     color: var(--main-grey-dark);
     font-size: clamp(45px, 13.5vw, 60px);
     transition: 0.2s;
+}
+
+.embedPlayer {
+    border: none;
+    width: 42px;
+    height: 42px;
+}
+
+#spoilerWarning {
+    max-width: 200px;
+    position: relative;
+    left: -10px;
+}
+#spoilerWarning[hidden] p {
+    text-wrap: nowrap;
+    overflow: hidden;
 }
 
 /* ^^ UNIVERSAL ^^ */
