@@ -35,50 +35,27 @@ function onLoad() {
 }
 document.addEventListener("DOMContentLoaded", onLoad);
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+let youtubeEmbed;
+function onYouTubeIframeAPIReady() {
+    youtubeEmbed = new YT.Player("player", {
+        height: "0",
+        width: "0",
+        videoId: "bsubv_Dma5s",
+        playerVars: {
+            controls: 0,
+            disablekb: 1,
+            playsinline: 1,
+            enablejsapi: 1,
+            origin: window.location.hostname
+        },
+        events: {
+            "onStateChange": onYoutubeEmbedStateChange
+        }
+    });
 }
 
-function collectSettings() {
-    chapters = [];
-    const chapSelectInputs = document.getElementById("chapterList")
-        .getElementsByTagName("input");
-    for (const input of chapSelectInputs) {
-        if (input.checked) {
-            chapters.push(Number(input.parentElement.textContent));
-        }
-    }
-
-    const ulTracks = document.getElementById("ulTracksToggle");
-    unlistedTracks = ulTracks.checked;
-
-    const textEntry = document.querySelector("input[value=textEntry]");
-    isTextEntry = textEntry.checked;
-
-    const modeInput = document.querySelector("input[name=quizMode]:checked");
-    mode = modeInput.value;
-
-    const diff = document.querySelector("input[name=difficulty]:checked");
-    switch(diff.value) {
-        case "easy":
-            difficulty = 0;
-            break;
-        case "medium":
-            difficulty = 1;
-            break;
-        case "hard":
-            difficulty = 2;
-            break;
-    }
-
-    rounds = Number(document.getElementById("rounds").textContent);
-
-    console.log(chapters);
-    console.log(unlistedTracks);
-    console.log(isTextEntry);
-    console.log(mode);
-    console.log(difficulty);
-    console.log(rounds);
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function maintainChecklist(checklistId, currentCheckbox) {
@@ -200,12 +177,80 @@ function collectTextInput() {
 }
 
 async function testSwap() {
-    const trackHeader = document.querySelector("#infoDiv h1")
-    const prompt = document.querySelector("#infoDiv p")
+    const trackHeader = document.querySelector("#infoDiv h1");
+    const prompt = document.querySelector("#infoDiv p");
 
     prompt.hidden = !prompt.hidden;
     await sleep(150);
     trackHeader.hidden = !trackHeader.hidden;
+}
+
+let prevEmbed;
+
+// source: string = "youtube", "bandcamp", "mp3". any other string will just delete previous embed
+// id: string = youtube video ID, bandcamp track ID, or mp3 name
+function setEmbedPlayer(source, id) {
+    const playerDiv = document.querySelector("#infoDiv div"); // remove previous embed
+    prevEmbed = document.querySelector("#infoDiv div *");
+    if (!(prevEmbed == null)) {
+        prevEmbed.remove();
+    }
+
+    const playControl = document.createElement("span"); // construct custom player
+    playControl.className = "customPlayer";
+    playControl.addEventListener("click", () => playerIconToggle(playControl));
+    const controlIcon = document.createElement("i");
+    controlIcon.classList.add("fa-solid");
+    controlIcon.classList.add("fa-play");
+    playControl.appendChild(controlIcon);
+
+    switch(source) {
+        case "bandcamp":
+            const embed = document.createElement("iframe");
+            embed.className = "embedPlayer";
+            embed.src = "https://bandcamp.com/EmbeddedPlayer/size=small/bgcol=333333/linkcol=4ec5ec/artwork=none/track=" +
+                id + "/transparent=true/";
+
+            playerDiv.appendChild(embed);
+            break;
+
+        case "youtube":
+            youtubeEmbed.cueVideoById(id);
+
+            playControl.addEventListener("click", () => {
+                // https://developers.google.com/youtube/iframe_api_reference#Playback_status
+                if (youtubeEmbed.getPlayerState() === 1) {
+                    youtubeEmbed.pauseVideo();
+                } else {
+                    youtubeEmbed.playVideo();
+                }
+            });
+
+            playerDiv.appendChild(playControl);
+            break;
+
+        case "mp3":
+            // not yet implemented
+            break;
+    }
+}
+
+function onYoutubeEmbedStateChange(event) {
+    const currentEmbedControl = document.querySelector("#infoDiv div span");
+
+    // https://developers.google.com/youtube/iframe_api_reference#Events
+    if (event.data === 0) {
+        playerIconToggle(currentEmbedControl);
+    }
+}
+
+function playerIconToggle(customPlayer) {
+    const icon = customPlayer.firstElementChild;
+    if (icon.classList.contains("fa-play")) {
+        icon.classList.replace("fa-play", "fa-pause");
+    } else {
+        icon.classList.replace("fa-pause", "fa-play");
+    }
 }
 
 // GAME-SPECIFIC
@@ -213,3 +258,45 @@ async function testSwap() {
 let chapters = [1, 2, 3, 4]; // will (probably????) be using acts for ULTRAKILL which are also just numbers
                                       // so maybe not game-specific?
 let unlistedTracks = false;
+
+function collectSettings() {
+    chapters = [];
+    const chapSelectInputs = document.getElementById("chapterList")
+        .getElementsByTagName("input");
+    for (const input of chapSelectInputs) {
+        if (input.checked) {
+            chapters.push(Number(input.parentElement.textContent));
+        }
+    }
+
+    const ulTracks = document.getElementById("ulTracksToggle");
+    unlistedTracks = ulTracks.checked;
+
+    const textEntry = document.querySelector("input[value=textEntry]");
+    isTextEntry = textEntry.checked;
+
+    const modeInput = document.querySelector("input[name=quizMode]:checked");
+    mode = modeInput.value;
+
+    const diff = document.querySelector("input[name=difficulty]:checked");
+    switch(diff.value) {
+        case "easy":
+            difficulty = 0;
+            break;
+        case "medium":
+            difficulty = 1;
+            break;
+        case "hard":
+            difficulty = 2;
+            break;
+    }
+
+    rounds = Number(document.getElementById("rounds").textContent);
+
+    console.log(chapters);
+    console.log(unlistedTracks);
+    console.log(isTextEntry);
+    console.log(mode);
+    console.log(difficulty);
+    console.log(rounds);
+}

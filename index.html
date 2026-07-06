@@ -6,6 +6,8 @@
     <title>Homepage</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
+    <script src="https://kit.fontawesome.com/35abe1cf36.js" crossorigin="anonymous"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 
 <body style="background-color: #232460">
@@ -128,14 +130,13 @@
     <div id="infoDiv">
         <h1 hidden>Track Name</h1>
         <div style="background-color: #333333; width: 80px;">
-            <iframe class="embedPlayer"
-                    src="https://bandcamp.com/EmbeddedPlayer/album=4122870521/size=small/bgcol=333333/linkcol=4ec5ec/artwork=none/track=4079358039/transparent=true/">
-            </iframe>
+            <!-- embed player/control inserted here with JS -->
         </div>
+        <div id="player"></div> <!-- invisible youtube embed source -->
         <p id="prompt">What is the name of this track?</p>
     </div>
     <div id="answers">
-        <button onclick="testSwap()">Answer 1</button>
+        <button>Answer 1</button>
         <button>Answer 2</button>
         <button>Answer 3</button>
 <!--        when switching to text entry, set display: block manually and use element.focus() -->
