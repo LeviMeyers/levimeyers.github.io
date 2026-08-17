@@ -1,5 +1,7 @@
 // UNIVERSAL
 
+let localPlayer;
+
 let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
@@ -9,6 +11,8 @@ let textInput;
 
 // runs on page load (mostly eventListener assignments)
 function onLoad() {
+    localPlayer = document.querySelector("audio");
+
     const modeInputs = document.getElementsByTagName("form").item(1)
         .getElementsByTagName("input");
     for (const input of modeInputs) {
@@ -191,11 +195,14 @@ let prevEmbed;
 // id: string = youtube video ID, bandcamp track ID, or ogg name
 // game: string = only applicable if calling as ogg. should match a directory under music/
 function setEmbedPlayer(source, id, game) {
-    const playerDiv = document.querySelector("#infoDiv div"); // remove previous embed
-    prevEmbed = document.querySelector("#infoDiv div *");
+    const playerDiv = document.querySelector("#infoDiv div");
+
+    prevEmbed = document.querySelector("#infoDiv div *");  // stop + remove previous embed
     if (!(prevEmbed == null)) {
         prevEmbed.remove();
     }
+    youtubeEmbed.stopVideo();
+    localPlayer.pause();
 
     const playControl = document.createElement("span"); // construct custom player
     playControl.className = "customPlayer";
@@ -204,8 +211,6 @@ function setEmbedPlayer(source, id, game) {
     controlIcon.classList.add("fa-solid");
     controlIcon.classList.add("fa-play");
     playControl.appendChild(controlIcon);
-
-    const localPlayer = document.querySelector("audio");
 
     switch(source) {
         case "bandcamp":
@@ -233,11 +238,7 @@ function setEmbedPlayer(source, id, game) {
             break;
 
         case "ogg":
-            try {
-                localPlayer.src = "music/" + game + "/" + id + ".ogg";
-            } catch (ReferenceError) {
-                console.log("Invalid game directory provided for ogg player!");
-            }
+            localPlayer.src = "music/" + game + "/" + id + ".ogg";
 
             playControl.addEventListener("click", () => {
                 if (localPlayer.paused) {
