@@ -21,9 +21,9 @@ Checklist is currently only for Deltarune (first game on the list). More will be
 - / Song info data collected from wikis -> converted to TSV -> read by JS
 - Song playback using Bandcamp widget
   - ~~Create iframe using generalized Bandcamp embed code, replace trackid~~
-  - Find a way to collect Bandcamp track ids in bulk
+  - ~~Find a way to collect Bandcamp track ids in bulk~~
 - ~~Song playback using YouTube widget if not available on Bandcamp~~
-- mp3 playback from stored files
+- ~~ogg playback from stored files~~
 
 Long-term:
 - Create necessary JS game class structure

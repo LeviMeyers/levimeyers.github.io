@@ -40,13 +40,13 @@ function onYouTubeIframeAPIReady() {
     youtubeEmbed = new YT.Player("player", {
         height: "0",
         width: "0",
-        videoId: "bsubv_Dma5s",
+        videoId: "P3CNlbAbKbE",
         playerVars: {
             controls: 0,
             disablekb: 1,
             playsinline: 1,
             enablejsapi: 1,
-            origin: window.location.hostname
+            origin: "https://levimeyers.github.io"
         },
         events: {
             "onStateChange": onYoutubeEmbedStateChange
@@ -187,9 +187,10 @@ async function testSwap() {
 
 let prevEmbed;
 
-// source: string = "youtube", "bandcamp", "mp3". any other string will just delete previous embed
-// id: string = youtube video ID, bandcamp track ID, or mp3 name
-function setEmbedPlayer(source, id) {
+// source: string = "youtube", "bandcamp", "ogg". any other string will just delete previous embed
+// id: string = youtube video ID, bandcamp track ID, or ogg name
+// game: string = only applicable if calling as ogg. should match a directory under music/
+function setEmbedPlayer(source, id, game) {
     const playerDiv = document.querySelector("#infoDiv div"); // remove previous embed
     prevEmbed = document.querySelector("#infoDiv div *");
     if (!(prevEmbed == null)) {
@@ -203,6 +204,8 @@ function setEmbedPlayer(source, id) {
     controlIcon.classList.add("fa-solid");
     controlIcon.classList.add("fa-play");
     playControl.appendChild(controlIcon);
+
+    const localPlayer = document.querySelector("audio");
 
     switch(source) {
         case "bandcamp":
@@ -229,8 +232,22 @@ function setEmbedPlayer(source, id) {
             playerDiv.appendChild(playControl);
             break;
 
-        case "mp3":
-            // not yet implemented
+        case "ogg":
+            try {
+                localPlayer.src = "music/" + game + "/" + id + ".ogg";
+            } catch (ReferenceError) {
+                console.log("Invalid game directory provided for ogg player!");
+            }
+
+            playControl.addEventListener("click", () => {
+                if (localPlayer.paused) {
+                    localPlayer.play();
+                } else {
+                    localPlayer.pause();
+                }
+            });
+
+            playerDiv.appendChild(playControl);
             break;
     }
 }
