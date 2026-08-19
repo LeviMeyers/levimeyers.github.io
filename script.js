@@ -300,26 +300,60 @@ function queueTSV(filePath) {
 
 // difficulty: number = 0/1/2
 function beginRound(difficulty) {
-    queueTSV("music/deltarune/chapter1.tsv");
+    // queueTSV("music/deltarune/chapter1.tsv");
 
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
     chosenTrack = trackList[chosenTrackIndex];
+    console.log(chosenTrack);
 
-    let wrongChoices = [];
-    if (difficulty === 2) {
-        wrongChoices = trackList.slice(chosenTrackIndex - 2, chosenTrackIndex + 2);
+    populateMultipleChoice(difficulty);
+
+    if (chosenTrack.bandcampID != 0) {
+        setEmbedPlayer("bandcamp", chosenTrack.bandcampID);
+    } else if (chosenTrack.youtubeURL !== "") {
+        setEmbedPlayer("youtube", chosenTrack.youtubeURL);
     } else {
-        wrongChoices = trackList.slice(chosenTrackIndex - 1, chosenTrackIndex + 1);
+        setEmbedPlayer("ogg", chosenTrack.trackName, "deltarune");
     }
 
+    // find out how to async this function to wait for the tsv queue
+    // add eventListeners to multiple choice buttons that progress the round
+}
+
+function populateMultipleChoice(difficulty) {
+    // !! IMPORTANT !!  because wrong choices are neighbors of the chosen track, the tracklist will need to be recycled
+    // as soon as there are less than 5 tracks left to avoid indexOutOfBounds or otherwise weird behavior.
+    let wrongChoices;
+    if (difficulty === 2) {
+        wrongChoices = trackList.slice(chosenTrackIndex - 2, chosenTrackIndex + 3);
+    } else {
+        wrongChoices = trackList.slice(chosenTrackIndex - 1, chosenTrackIndex + 2);
+    }
+    wrongChoices.splice(Math.floor(wrongChoices.length / 2), 1); // remove middle index (correct choice)
+    if (difficulty === 2) {
+        wrongChoices.splice(Math.floor(Math.random() * 4), 1); // make sure there are only 3 wrong options
+    }
+    console.log(wrongChoices);
+
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
-    console.log(buttons);
+
     correctButtonIndex = Math.floor(Math.random() * buttons.length);
     correctButton = buttons[correctButtonIndex];
     correctButton.textContent = chosenTrack.trackName;
-    buttons.splice(correctButtonIndex);
+    buttons.splice(correctButtonIndex, 1);
 
-    // trackList.splice(chosenTrackIndex);
+    while (buttons.length > 0) {
+        const randWrongIndex = Math.floor(Math.random() * wrongChoices.length);
+        const randWrong = wrongChoices[randWrongIndex];
+        const randIncorrectButtonIndex = Math.floor(Math.random() * buttons.length);
+
+        buttons[randIncorrectButtonIndex].textContent = randWrong.trackName;
+
+        wrongChoices.splice(randWrongIndex, 1);
+        buttons.splice(randIncorrectButtonIndex, 1);
+    }
+
+    trackList.splice(chosenTrackIndex, 1);
 }
 
 // GAME-SPECIFIC
