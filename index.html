@@ -8,6 +8,7 @@
     <script src="script.js"></script>
     <script src="https://kit.fontawesome.com/35abe1cf36.js" crossorigin="anonymous"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 
 <body style="background-color: #232460">
@@ -137,10 +138,10 @@
         <p id="prompt">What is the name of this track?</p>
     </div>
     <div id="answers">
-        <button>Answer 1</button>
-        <button>Answer 2</button>
-        <button>Answer 3</button>
-<!--        when switching to text entry, set display: block manually and use element.focus() -->
+        <button class="choice">Answer 1</button>
+        <button class="choice">Answer 2</button>
+        <button class="choice">Answer 3</button>
+<!--        when switching to text entry, set display: flex manually and use element.focus() -->
         <label id="gameTextEntry" style="display: none">
             <textarea autocomplete="off" spellcheck="false" placeholder="Type answer here..."></textarea>
             <button onclick="collectTextInput()"></button>

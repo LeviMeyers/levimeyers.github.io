@@ -7,6 +7,12 @@ let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 let rounds = 10;
 
+let trackList = [];
+let chosenTrackIndex;
+let chosenTrack;
+let correctButtonIndex;
+let correctButton;
+
 let textInput;
 
 // runs on page load (mostly eventListener assignments)
@@ -180,7 +186,7 @@ function collectTextInput() {
     textInput = inputArea.value;
 }
 
-async function testSwap() {
+async function toggleNameReveal() {
     const trackHeader = document.querySelector("#infoDiv h1");
     const prompt = document.querySelector("#infoDiv p");
 
@@ -192,7 +198,7 @@ async function testSwap() {
 let prevEmbed;
 
 // source: string = "youtube", "bandcamp", "ogg". any other string will just delete previous embed
-// id: string = youtube video ID, bandcamp track ID, or ogg name
+// id: string/number = youtube video ID, bandcamp track ID, or ogg name
 // game: string = only applicable if calling as ogg. should match a directory under music/
 function setEmbedPlayer(source, id, game) {
     const playerDiv = document.querySelector("#infoDiv div");
@@ -269,6 +275,51 @@ function playerIconToggle(customPlayer) {
     } else {
         icon.classList.replace("fa-pause", "fa-play");
     }
+}
+
+// filePath: string = must be a tsv file
+function queueTSV(filePath) {
+    d3.tsv(filePath, function (data) { // https://www.geeksforgeeks.org/javascript/d3-js-tsv-function/
+        return data; // obligatory function to fulfill first parameter
+    }, (data) => {
+        const formattedData = data.map(row => ({ // reformat each row using .map()
+            trackNumber: +row.trackNumber,
+            trackName: row.trackName,
+            location: row.location.split("/"),
+            motifs: row.motifs.split("/"),
+            bandcampID: +row.bandcampID,
+            youtubeURL: row.youtubeURL,
+        }));
+
+        formattedData.forEach((row) => {
+            trackList.push(row);
+        })
+        console.log("successfully queued tracks")
+    });
+}
+
+// difficulty: number = 0/1/2
+function beginRound(difficulty) {
+    queueTSV("music/deltarune/chapter1.tsv");
+
+    chosenTrackIndex = Math.floor(Math.random() * trackList.length);
+    chosenTrack = trackList[chosenTrackIndex];
+
+    let wrongChoices = [];
+    if (difficulty === 2) {
+        wrongChoices = trackList.slice(chosenTrackIndex - 2, chosenTrackIndex + 2);
+    } else {
+        wrongChoices = trackList.slice(chosenTrackIndex - 1, chosenTrackIndex + 1);
+    }
+
+    const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
+    console.log(buttons);
+    correctButtonIndex = Math.floor(Math.random() * buttons.length);
+    correctButton = buttons[correctButtonIndex];
+    correctButton.textContent = chosenTrack.trackName;
+    buttons.splice(correctButtonIndex);
+
+    // trackList.splice(chosenTrackIndex);
 }
 
 // GAME-SPECIFIC
