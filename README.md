@@ -18,8 +18,8 @@ Checklist is currently only for Deltarune (first game on the list). More will be
   - / Text entry: entry box, answer feedback after clicked
   - Timing function + points scored
   - / Next button
-- / Song info data collected from wikis -> converted to TSV -> read by JS
-- Song playback using Bandcamp widget
+- ~~Song info data collected from wikis -> converted to TSV -> read by JS~~
+- ~~Song playback using Bandcamp widget~~
   - ~~Create iframe using generalized Bandcamp embed code, replace trackid~~
   - ~~Find a way to collect Bandcamp track ids in bulk~~
 - ~~Song playback using YouTube widget if not available on Bandcamp~~
@@ -30,3 +30,4 @@ Long-term:
 - Collect other game data and create individual pages
 - Switch index.html to game selection page
 - Cross-platform multiplayer similar to Kahoot (will probably need to switch hosting service for this)
+- Custom track lists/quizzes?
