@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", onLoad);
 let youtubeEmbed;
 function onYouTubeIframeAPIReady() {
     youtubeEmbed = new YT.Player("player", {
-        height: "0",
-        width: "0",
+        height: "10",
+        width: "10",
         videoId: "P3CNlbAbKbE",
         playerVars: {
             controls: 0,
@@ -197,7 +197,7 @@ async function toggleNameReveal() {
 
 let prevEmbed;
 
-// source: string = "youtube", "bandcamp", "ogg". any other string will just delete previous embed
+// source: string = "youtube", "bandcamp", "local". any other string will just delete previous embed
 // id: string/number = youtube video ID, bandcamp track ID, or ogg name
 // game: string = only applicable if calling as ogg. should match a directory under music/
 function setEmbedPlayer(source, id, game) {
@@ -243,8 +243,12 @@ function setEmbedPlayer(source, id, game) {
             playerDiv.appendChild(playControl);
             break;
 
-        case "ogg":
-            localPlayer.src = "music/" + game + "/" + id + ".ogg";
+        case "local":
+            if (id.includes("ogg") || id.includes("mp3") || id.includes("wav")) {
+                localPlayer.src = "music/" + game + "/" + id;
+            } else {
+                localPlayer.src = "music/" + game + "/" + id + ".ogg";
+            }
 
             playControl.addEventListener("click", () => {
                 if (localPlayer.paused) {
@@ -278,29 +282,28 @@ function playerIconToggle(customPlayer) {
 }
 
 // filePath: string = must be a tsv file
-function queueTSV(filePath) {
-    d3.tsv(filePath, function (data) { // https://www.geeksforgeeks.org/javascript/d3-js-tsv-function/
-        return data; // obligatory function to fulfill first parameter
-    }, (data) => {
-        const formattedData = data.map(row => ({ // reformat each row using .map()
+async function queueTSV(filePath) {
+    const data = await d3.tsv(filePath, (row => { // https://d3js.org/d3-fetch#dsv
+        return {
             trackNumber: +row.trackNumber,
             trackName: row.trackName,
             location: row.location.split("/"),
-            motifs: row.motifs.split("/"),
+            motifs: row.motifs.split("/").filter(function (m) {
+                return m !== ""; // remove empty string array elements from 0-motif tracks
+            }),
             bandcampID: +row.bandcampID,
             youtubeURL: row.youtubeURL,
-        }));
-
-        formattedData.forEach((row) => {
-            trackList.push(row);
-        })
-        console.log("successfully queued tracks")
-    });
+        }
+    }))
+    data.forEach((row) => {
+        trackList.push(row);
+    })
+    console.log("successfully queued tracks");
 }
 
 // difficulty: number = 0/1/2
-function beginRound(difficulty) {
-    // queueTSV("music/deltarune/chapter1.tsv");
+async function beginRound(difficulty) {
+    // await queueTSV("music/deltarune/chapter1.tsv"); use this ONCE after game begins
 
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
     chosenTrack = trackList[chosenTrackIndex];
@@ -308,39 +311,55 @@ function beginRound(difficulty) {
 
     populateMultipleChoice(difficulty);
 
-    if (chosenTrack.bandcampID != 0) {
+    if (chosenTrack.bandcampID !== 0) {
         setEmbedPlayer("bandcamp", chosenTrack.bandcampID);
     } else if (chosenTrack.youtubeURL !== "") {
         setEmbedPlayer("youtube", chosenTrack.youtubeURL);
     } else {
-        setEmbedPlayer("ogg", chosenTrack.trackName, "deltarune");
+        setEmbedPlayer("local", normalizeUnlisted(chosenTrack.trackName), "deltarune");
     }
 
-    // find out how to async this function to wait for the tsv queue
     // add eventListeners to multiple choice buttons that progress the round
 }
 
 function populateMultipleChoice(difficulty) {
-    // !! IMPORTANT !!  because wrong choices are neighbors of the chosen track, the tracklist will need to be recycled
-    // as soon as there are less than 5 tracks left to avoid indexOutOfBounds or otherwise weird behavior.
-    let wrongChoices;
-    if (difficulty === 2) {
-        wrongChoices = trackList.slice(chosenTrackIndex - 2, chosenTrackIndex + 3);
-    } else {
-        wrongChoices = trackList.slice(chosenTrackIndex - 1, chosenTrackIndex + 2);
-    }
-    wrongChoices.splice(Math.floor(wrongChoices.length / 2), 1); // remove middle index (correct choice)
-    if (difficulty === 2) {
-        wrongChoices.splice(Math.floor(Math.random() * 4), 1); // make sure there are only 3 wrong options
-    }
-    console.log(wrongChoices);
-
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
 
     correctButtonIndex = Math.floor(Math.random() * buttons.length);
     correctButton = buttons[correctButtonIndex];
     correctButton.textContent = chosenTrack.trackName;
     buttons.splice(correctButtonIndex, 1);
+
+    // !! IMPORTANT !!  because wrong choices are neighbors of the chosen track, this function will need to start
+    // pulling from an untouched copy of the original tracklist when the actual tracklist is small enough
+    let wrongChoices;
+    if (difficulty === 1) {
+        if (chosenTrackIndex === 0) {
+            wrongChoices = trackList.slice(1, 3);
+        } else if (chosenTrackIndex === trackList.length - 1) {
+            wrongChoices = trackList.slice(trackList.length - 3, trackList.length - 1);
+        } else {
+            wrongChoices = trackList.slice(chosenTrackIndex - 1, chosenTrackIndex + 2);
+            wrongChoices.splice(Math.floor(wrongChoices.length / 2), 1); // remove middle index (correct choice)
+        }
+    } else {
+        if (chosenTrackIndex === 0) {
+            wrongChoices = trackList.slice(1, 5);
+        } else if (chosenTrackIndex === trackList.length - 1) {
+            wrongChoices = trackList.slice(trackList.length - 5, trackList.length - 1);
+        } else {
+            wrongChoices = trackList.slice(chosenTrackIndex - 2, chosenTrackIndex + 3);
+            wrongChoices.splice(Math.floor(wrongChoices.length / 2), 1); // remove middle index (correct choice)
+        }
+    }
+    // wrongChoices.forEach((track) => {
+    //     console.log(track);
+    // })
+
+    // delete random wrong choices until the amount of wrong choices matches the amount of buttons to fill
+    while (wrongChoices.length > buttons.length) {
+        wrongChoices.splice(Math.floor(Math.random() * wrongChoices.length), 1);
+    }
 
     while (buttons.length > 0) {
         const randWrongIndex = Math.floor(Math.random() * wrongChoices.length);
@@ -354,6 +373,17 @@ function populateMultipleChoice(difficulty) {
     }
 
     trackList.splice(chosenTrackIndex, 1);
+}
+
+// trackName: string
+function normalizeUnlisted(trackName) {
+    if (trackName.includes(".ogg")
+    || trackName.includes(".mp3")
+    || trackName.includes(".wav")) {
+        return trackName.substring(0, trackName.length - 4);
+    } else {
+        return trackName;
+    }
 }
 
 // GAME-SPECIFIC
