@@ -1,24 +1,64 @@
 // PAGE-SPECIFIC (deltarune.js) //
 
-async function game() {
-    if (chapters.includes(1)) {
-        await queueTSV("data/deltarune/chapter1.tsv");
-        if (unlistedTracks) {
-            // wip
-        }
-    }
-}
-
-// CORE //
-
-let localPlayer;
-
 let chapters = [1, 2, 3, 4];
 let unlistedTracks = false;
 let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 let rounds = 10;
+
+let trackListCopy;
+
+function collectSettings() {
+    chapters = [];
+    const chapSelectInputs = document.getElementById("chapterList")
+        .getElementsByTagName("input");
+    for (const input of chapSelectInputs) {
+        if (input.checked) {
+            chapters.push(Number(input.parentElement.textContent));
+        }
+    }
+
+    const ulTracks = document.getElementById("ulTracksToggle");
+    unlistedTracks = ulTracks.checked;
+
+    const textEntry = document.querySelector("input[value=textEntry]");
+    isTextEntry = textEntry.checked;
+
+    const modeInput = document.querySelector("input[name=quizMode]:checked");
+    mode = modeInput.value;
+
+    const diff = document.querySelector("input[name=difficulty]:checked");
+    switch(diff.value) {
+        case "easy":
+            difficulty = 0;
+            break;
+        case "medium":
+            difficulty = 1;
+            break;
+        case "hard":
+            difficulty = 2;
+            break;
+    }
+
+    rounds = Number(document.getElementById("rounds").textContent);
+}
+
+async function game() {
+    if (chapters.includes(1)) {
+        await queueTSV("data/deltarune/chapter1.tsv");
+        if (!unlistedTracks) {
+            trackList.splice(-2, 2); // removes last two tracks
+        }
+    }
+
+    // must be sent to quiz module
+    trackListCopy = trackList.slice();
+}
+
+// CORE //
+
+let localPlayer;
 
 let textInput;
 
@@ -159,47 +199,6 @@ function modifyNum(numElement, newValue) {
 }
 
 // might end up being game-specific based on game setting discrepancies
-function collectSettings() {
-    chapters = [];
-    const chapSelectInputs = document.getElementById("chapterList")
-        .getElementsByTagName("input");
-    for (const input of chapSelectInputs) {
-        if (input.checked) {
-            chapters.push(Number(input.parentElement.textContent));
-        }
-    }
-
-    const ulTracks = document.getElementById("ulTracksToggle");
-    unlistedTracks = ulTracks.checked;
-
-    const textEntry = document.querySelector("input[value=textEntry]");
-    isTextEntry = textEntry.checked;
-
-    const modeInput = document.querySelector("input[name=quizMode]:checked");
-    mode = modeInput.value;
-
-    const diff = document.querySelector("input[name=difficulty]:checked");
-    switch(diff.value) {
-        case "easy":
-            difficulty = 0;
-            break;
-        case "medium":
-            difficulty = 1;
-            break;
-        case "hard":
-            difficulty = 2;
-            break;
-    }
-
-    rounds = Number(document.getElementById("rounds").textContent);
-
-    console.log(chapters);
-    console.log(unlistedTracks);
-    console.log(isTextEntry);
-    console.log(mode);
-    console.log(difficulty);
-    console.log(rounds);
-}
 
 // when implemented, call once before using setInterval to avoid 500 ms delay
 // nowPlayingLoop; setInterval(nowPlayingLoop, 500);
@@ -333,6 +332,7 @@ function setEmbedPlayer(source, id, game) {
 
 // QUIZ //
 
+// trackList must be accessible by other modules
 let trackList = [];
 let chosenTrackIndex;
 let chosenTrack;
@@ -383,56 +383,60 @@ async function beginRound(game, difficulty) {
 
 function populateMultipleChoice(difficulty) {
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
+    let trackListPull = trackList;
+    let chosenTrackIndexPull = chosenTrackIndex;
 
-    correctButtonIndex = Math.floor(Math.random() * buttons.length);
-    correctButton = buttons[correctButtonIndex];
-    correctButton.textContent = chosenTrack.trackName;
-    buttons.splice(correctButtonIndex, 1);
-
-    // !! IMPORTANT !!  because wrong choices are neighbors of the chosen track, this function will need to start
-    // pulling from an untouched copy of the original tracklist when the actual tracklist is small enough
-    let wrongChoices;
-    if (difficulty === 1) {
-        if (chosenTrackIndex === 0) {
-            wrongChoices = trackList.slice(1, 3);
-        } else if (chosenTrackIndex === trackList.length - 1) {
-            wrongChoices = trackList.slice(trackList.length - 3, trackList.length - 1);
-        } else {
-            wrongChoices = trackList.slice(chosenTrackIndex - 1, chosenTrackIndex + 2);
-            wrongChoices.splice(Math.floor(wrongChoices.length / 2), 1); // remove middle index (correct choice)
-        }
-    } else {
-        if (chosenTrackIndex === 0) {
-            wrongChoices = trackList.slice(1, 5);
-        } else if (chosenTrackIndex === trackList.length - 1) {
-            wrongChoices = trackList.slice(trackList.length - 5, trackList.length - 1);
-        } else {
-            wrongChoices = trackList.slice(chosenTrackIndex - 2, chosenTrackIndex + 3);
-            wrongChoices.splice(Math.floor(wrongChoices.length / 2), 1); // remove middle index (correct choice)
-        }
+    // if track list is small enough to cause trivial track comparisons, switch references to an untouched copy
+    if (trackList.length < Math.floor(trackListCopy.length * 0.25)) {
+        trackListPull = trackListCopy;
+        chosenTrackIndexPull = trackListPull.indexOf(chosenTrack);
     }
-    // wrongChoices.forEach((track) => {
-    //     console.log(track);
-    // })
 
-    // delete random wrong choices until the amount of wrong choices matches the amount of buttons to fill
-    while (wrongChoices.length > buttons.length) {
-        wrongChoices.splice(Math.floor(Math.random() * wrongChoices.length), 1);
+    // give a random button the correct track title and remove it from the available buttons list
+    buttons.splice(Math.floor(Math.random() * buttons.length), 1)[0].textContent = chosenTrack.trackName;
+
+    let wrongChoices = [];
+    if (difficulty === 0) { // choose completely random tracks
+        while (wrongChoices.length < 2) {
+            const randSong = trackListPull[Math.floor(Math.random() * trackListPull.length)];
+            if (!wrongChoices.includes(randSong)
+                && chosenTrack !== randSong) {
+                wrongChoices.push(randSong);
+            }
+        }
+    } else { // choose random tracks in a 2-track radius around the correct one
+        wrongChoices = findAdjacents(trackListPull, chosenTrackIndexPull, 2);
     }
 
     while (buttons.length > 0) {
-        const randWrongIndex = Math.floor(Math.random() * wrongChoices.length);
-        const randWrong = wrongChoices[randWrongIndex];
-        const randIncorrectButtonIndex = Math.floor(Math.random() * buttons.length);
-
-        buttons[randIncorrectButtonIndex].textContent = randWrong.trackName;
-
-        wrongChoices.splice(randWrongIndex, 1);
-        buttons.splice(randIncorrectButtonIndex, 1);
+        // choose a random wrong answer and delete it from the list
+        const randWrong = wrongChoices.splice(Math.floor(Math.random() * wrongChoices.length), 1)[0];
+        // give a random button the wrong answer and delete it from the buttons list
+        buttons.splice(Math.floor(Math.random() * buttons.length), 1)[0].textContent = randWrong.trackName;
     }
 
     trackList.splice(chosenTrackIndex, 1);
 }
+
+// array: array
+// index: number = index of item to search around
+// radius: number = radius to be searched
+function findAdjacents(array, index, radius) {
+    let adjacents;
+    const itemAtIndex = array[index];
+
+    if (index < radius) { // if item is too close to start of array
+        adjacents = array.slice(0, radius * 2 + 1);
+    } else if (index > array.length - (radius + 1)) { // if item is too close to end of array
+        adjacents = array.slice(array.length - (radius * 2 + 1), array.length);
+    } else {
+        adjacents = array.slice(index - radius, index + radius + 1);
+    }
+
+    adjacents.splice(adjacents.indexOf(itemAtIndex), 1); // remove original item at index
+    return adjacents;
+}
+// returns an array of size radius * 2
 
 // trackName: string
 function normalizeUnlisted(trackName) {
