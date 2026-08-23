@@ -1,17 +1,24 @@
-// UNIVERSAL
+// PAGE-SPECIFIC (deltarune.js) //
+
+async function game() {
+    if (chapters.includes(1)) {
+        await queueTSV("data/deltarune/chapter1.tsv");
+        if (unlistedTracks) {
+            // wip
+        }
+    }
+}
+
+// CORE //
 
 let localPlayer;
 
+let chapters = [1, 2, 3, 4];
+let unlistedTracks = false;
 let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 let rounds = 10;
-
-let trackList = [];
-let chosenTrackIndex;
-let chosenTrack;
-let correctButtonIndex;
-let correctButton;
 
 let textInput;
 
@@ -62,6 +69,15 @@ function onYouTubeIframeAPIReady() {
             "onStateChange": onYoutubeEmbedStateChange
         }
     });
+}
+
+function onYoutubeEmbedStateChange(event) {
+    const currentEmbedControl = document.querySelector("#infoDiv div span");
+
+    // https://developers.google.com/youtube/iframe_api_reference#Events
+    if (event.data === 0) {
+        playerIconToggle(currentEmbedControl);
+    }
 }
 
 function sleep(ms) {
@@ -142,6 +158,49 @@ function modifyNum(numElement, newValue) {
     numElement.classList.add("nudgeAnim");
 }
 
+// might end up being game-specific based on game setting discrepancies
+function collectSettings() {
+    chapters = [];
+    const chapSelectInputs = document.getElementById("chapterList")
+        .getElementsByTagName("input");
+    for (const input of chapSelectInputs) {
+        if (input.checked) {
+            chapters.push(Number(input.parentElement.textContent));
+        }
+    }
+
+    const ulTracks = document.getElementById("ulTracksToggle");
+    unlistedTracks = ulTracks.checked;
+
+    const textEntry = document.querySelector("input[value=textEntry]");
+    isTextEntry = textEntry.checked;
+
+    const modeInput = document.querySelector("input[name=quizMode]:checked");
+    mode = modeInput.value;
+
+    const diff = document.querySelector("input[name=difficulty]:checked");
+    switch(diff.value) {
+        case "easy":
+            difficulty = 0;
+            break;
+        case "medium":
+            difficulty = 1;
+            break;
+        case "hard":
+            difficulty = 2;
+            break;
+    }
+
+    rounds = Number(document.getElementById("rounds").textContent);
+
+    console.log(chapters);
+    console.log(unlistedTracks);
+    console.log(isTextEntry);
+    console.log(mode);
+    console.log(difficulty);
+    console.log(rounds);
+}
+
 // when implemented, call once before using setInterval to avoid 500 ms delay
 // nowPlayingLoop; setInterval(nowPlayingLoop, 500);
 function nowPlayingLoop() {
@@ -193,6 +252,15 @@ async function toggleNameReveal() {
     prompt.hidden = !prompt.hidden;
     await sleep(150);
     trackHeader.hidden = !trackHeader.hidden;
+}
+
+function playerIconToggle(customPlayer) {
+    const icon = customPlayer.firstElementChild;
+    if (icon.classList.contains("fa-play")) {
+        icon.classList.replace("fa-play", "fa-pause");
+    } else {
+        icon.classList.replace("fa-pause", "fa-play");
+    }
 }
 
 let prevEmbed;
@@ -263,23 +331,13 @@ function setEmbedPlayer(source, id, game) {
     }
 }
 
-function onYoutubeEmbedStateChange(event) {
-    const currentEmbedControl = document.querySelector("#infoDiv div span");
+// QUIZ //
 
-    // https://developers.google.com/youtube/iframe_api_reference#Events
-    if (event.data === 0) {
-        playerIconToggle(currentEmbedControl);
-    }
-}
-
-function playerIconToggle(customPlayer) {
-    const icon = customPlayer.firstElementChild;
-    if (icon.classList.contains("fa-play")) {
-        icon.classList.replace("fa-play", "fa-pause");
-    } else {
-        icon.classList.replace("fa-pause", "fa-play");
-    }
-}
+let trackList = [];
+let chosenTrackIndex;
+let chosenTrack;
+let correctButtonIndex;
+let correctButton;
 
 // filePath: string = must be a tsv file
 async function queueTSV(filePath) {
@@ -301,8 +359,9 @@ async function queueTSV(filePath) {
     console.log("successfully queued tracks");
 }
 
+// game: string
 // difficulty: number = 0/1/2
-async function beginRound(difficulty) {
+async function beginRound(game, difficulty) {
     // await queueTSV("music/deltarune/chapter1.tsv"); use this ONCE after game begins
 
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
@@ -316,7 +375,7 @@ async function beginRound(difficulty) {
     } else if (chosenTrack.youtubeURL !== "") {
         setEmbedPlayer("youtube", chosenTrack.youtubeURL);
     } else {
-        setEmbedPlayer("local", normalizeUnlisted(chosenTrack.trackName), "deltarune");
+        setEmbedPlayer("local", normalizeUnlisted(chosenTrack.trackName), game);
     }
 
     // add eventListeners to multiple choice buttons that progress the round
@@ -384,52 +443,4 @@ function normalizeUnlisted(trackName) {
     } else {
         return trackName;
     }
-}
-
-// GAME-SPECIFIC
-
-let chapters = [1, 2, 3, 4]; // will (probably????) be using acts for ULTRAKILL which are also just numbers
-                                      // so maybe not game-specific?
-let unlistedTracks = false;
-
-function collectSettings() {
-    chapters = [];
-    const chapSelectInputs = document.getElementById("chapterList")
-        .getElementsByTagName("input");
-    for (const input of chapSelectInputs) {
-        if (input.checked) {
-            chapters.push(Number(input.parentElement.textContent));
-        }
-    }
-
-    const ulTracks = document.getElementById("ulTracksToggle");
-    unlistedTracks = ulTracks.checked;
-
-    const textEntry = document.querySelector("input[value=textEntry]");
-    isTextEntry = textEntry.checked;
-
-    const modeInput = document.querySelector("input[name=quizMode]:checked");
-    mode = modeInput.value;
-
-    const diff = document.querySelector("input[name=difficulty]:checked");
-    switch(diff.value) {
-        case "easy":
-            difficulty = 0;
-            break;
-        case "medium":
-            difficulty = 1;
-            break;
-        case "hard":
-            difficulty = 2;
-            break;
-    }
-
-    rounds = Number(document.getElementById("rounds").textContent);
-
-    console.log(chapters);
-    console.log(unlistedTracks);
-    console.log(isTextEntry);
-    console.log(mode);
-    console.log(difficulty);
-    console.log(rounds);
 }
