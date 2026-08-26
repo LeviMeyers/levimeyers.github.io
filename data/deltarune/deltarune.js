@@ -44,7 +44,7 @@ function collectSettings() {
     rounds = Number(document.getElementById("rounds").textContent);
 }
 
-async function game() {
+async function runQuiz() {
     if (chapters.includes(1)) {
         await queueTSV("data/deltarune/chapter1.tsv");
         if (!unlistedTracks) {
@@ -52,7 +52,19 @@ async function game() {
         }
     }
 
-    // must be sent to quiz module
+    for (let i = 0; i < rounds; i++) {
+        // must be sent to quiz module
+        trackListCopy = trackList.slice();
+
+        await quizRound("deltarune", difficulty, "trackName");
+    }
+    console.log("rounds exhausted");
+    // after all rounds are complete, show results screen
+}
+
+async function initQuiz() {
+    await queueTSV("data/deltarune/chapter1.tsv");
+
     trackListCopy = trackList.slice();
 }
 
@@ -198,8 +210,6 @@ function modifyNum(numElement, newValue) {
     numElement.classList.add("nudgeAnim");
 }
 
-// might end up being game-specific based on game setting discrepancies
-
 // when implemented, call once before using setInterval to avoid 500 ms delay
 // nowPlayingLoop; setInterval(nowPlayingLoop, 500);
 function nowPlayingLoop() {
@@ -336,7 +346,7 @@ function setEmbedPlayer(source, id, game) {
 let trackList = [];
 let chosenTrackIndex;
 let chosenTrack;
-let correctButtonIndex;
+
 let correctButton;
 
 // filePath: string = must be a tsv file
@@ -361,9 +371,8 @@ async function queueTSV(filePath) {
 
 // game: string
 // difficulty: number = 0/1/2
-async function beginRound(game, difficulty) {
-    // await queueTSV("music/deltarune/chapter1.tsv"); use this ONCE after game begins
-
+// mode: string = "trackName", "locationPlayed", "motif"
+async function quizRound(game, difficulty, mode) {
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
     chosenTrack = trackList[chosenTrackIndex];
     console.log(chosenTrack);
@@ -378,8 +387,11 @@ async function beginRound(game, difficulty) {
         setEmbedPlayer("local", normalizeUnlisted(chosenTrack.trackName), game);
     }
 
-    // add eventListeners to multiple choice buttons that progress the round
+    await resolveMultChoiceRound();
+    await resetRound();
+    console.log("round complete");
 }
+// return num points earned
 
 function populateMultipleChoice(difficulty) {
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
@@ -392,8 +404,11 @@ function populateMultipleChoice(difficulty) {
         chosenTrackIndexPull = trackListPull.indexOf(chosenTrack);
     }
 
-    // give a random button the correct track title and remove it from the available buttons list
-    buttons.splice(Math.floor(Math.random() * buttons.length), 1)[0].textContent = chosenTrack.trackName;
+    // give a random button the correct track title + "correct" id and remove it from the available buttons list
+    correctButton = buttons[Math.floor(Math.random() * buttons.length)];
+    correctButton.textContent = chosenTrack.trackName;
+    correctButton.id = "correct";
+    buttons.splice(buttons.indexOf(correctButton), 1);
 
     let wrongChoices = [];
     if (difficulty === 0) { // choose completely random tracks
@@ -416,6 +431,65 @@ function populateMultipleChoice(difficulty) {
     }
 
     trackList.splice(chosenTrackIndex, 1);
+}
+
+function resolveMultChoiceRound() {
+    const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
+
+    return new Promise((resolve) => {
+        async function clickDetector() { // what to do once button is clicked
+            buttons.forEach((but) => {
+                but.removeEventListener("click", clickDetector); // remove event listeners to avoid inception
+                but.disabled = true;
+            })
+
+            if (!(this === correctButton)) {
+                this.style.color = "var(--soft-red)";
+            }
+
+            correctButton.style.border = "solid 3px var(--accent-green-dark)";
+            correctButton.style.color = "var(--accent-green-dark)";
+
+            document.querySelector("#infoDiv h1").textContent = chosenTrack.trackName;
+            await toggleNameReveal();
+
+            resolve();
+        }
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", clickDetector);
+        })
+    })
+}
+
+
+async function resetRound() {
+    const nextButton = document.querySelector(".game button.next");
+    const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
+
+    await sleep(1000);
+    nextButton.hidden = false;
+
+    return new Promise((resolve) => {
+        async function clickDetector() {
+            nextButton.removeEventListener("click", clickDetector);
+            nextButton.hidden = true;
+
+            await toggleNameReveal();
+
+            document.querySelector("#infoDiv h1").textContent = "";
+            document.querySelector("#gameTextEntry textarea").textContent = "";
+            document.querySelector("#gameTextEntry textarea").attributeStyleMap.clear();
+            buttons.forEach((button) => {
+                button.disabled = false;
+                button.attributeStyleMap.clear();
+            })
+
+            resolve();
+        }
+
+        nextButton.addEventListener("click", clickDetector);
+    })
 }
 
 // array: array

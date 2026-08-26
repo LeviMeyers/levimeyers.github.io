@@ -5,6 +5,7 @@
     --accent-green-dark: #69c989;
     --white-dark: #cacaca;
     --soft-red: #e15d5d;
+    --gold-yellow: #f8f880;
 }
 @font-face {
     font-family: "8bitoperator JVE";
@@ -148,13 +149,21 @@ div[hidden] {
 }
 #infoDiv h1 {
     justify-self: center;
-    color: transparent;
-    background: linear-gradient(to top, #d6d6a7, #dfdf4f);
-    background-clip: text;
-    filter: drop-shadow(0 0 10px rgb(214 214 146 / 0.75));
+    text-shadow: 0 3px 0 var(--main-grey-dark);
 }
 #infoDiv p {
     font-size: 27px;
+}
+
+/* cool golden glowy text
+color: transparent;
+background: linear-gradient(to top, #d6d6a7, var(--gold-yellow));
+background-clip: text;
+filter: drop-shadow(0 0 10px rgb(214 214 146 / 0.75));
+ */
+
+#prompt {
+    color: var(--gold-yellow);
 }
 
 .switch {
@@ -278,6 +287,8 @@ button[hidden] {
 }
 button[disabled] {
     cursor: default;
+    border: solid var(--main-grey) 3px;
+    color: var(--main-grey);
 }
 
 div.numController {
@@ -351,11 +362,8 @@ span.numController {
 button.next:hover {
     color: white;
     border: solid white 5px;
-    background-color: var(--accent-green);
-    transition: transform 0.1s linear, background-color 0s;
-}
-button.next:active {
     background-color: var(--accent-green-dark);
+    transition: transform 0.1s linear, background-color 0.1s;
 }
 button.next[hidden] {
     max-width: 0;
@@ -363,6 +371,7 @@ button.next[hidden] {
     padding: 0;
     margin: 0;
     border: none;
+    box-shadow: none;
 }
 /* add using JS */
 /*button.correct {*/
