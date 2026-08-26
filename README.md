@@ -11,13 +11,11 @@ Checklist is currently only for Deltarune (first game on the list). More will be
   - ~~Text entry modes: track name, motif~~
   - ~~Number of rounds~~
 - Repeatable game round page using data from settings + song info
-  - / Now playing...
-  - / Obscured -> track name with cool text shadow effect or something
-  - / Prompt: track name, motif, location played
-  - / Multiple choice: 3+ buttons, answer feedback on buttons after clicked
+  - Prompt: ~~track name~~, motif, location played
+  - ~~Multiple choice: 3+ buttons, answer feedback on buttons after clicked~~
   - / Text entry: entry box, answer feedback after clicked
   - Timing function + points scored
-  - / Next button
+  - ~~Next button~~
 - ~~Song info data collected from wikis -> converted to TSV -> read by JS~~
 - ~~Song playback using Bandcamp widget~~
   - ~~Create iframe using generalized Bandcamp embed code, replace trackid~~
