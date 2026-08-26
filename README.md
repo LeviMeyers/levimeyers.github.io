@@ -9,7 +9,7 @@ Checklist is currently only for Deltarune (first game on the list). More will be
   - ~~Multiple choice modes: track name, motif, location played~~
   - ~~Difficulties (multiple choice only): easy, medium, hard~~
   - ~~Text entry modes: track name, motif~~
-  - ~~Number of rounds~~
+  - / Number of rounds: custom or all
 - Repeatable game round page using data from settings + song info
   - Prompt: ~~track name~~, motif, location played
   - ~~Multiple choice: 3+ buttons, answer feedback on buttons after clicked~~
