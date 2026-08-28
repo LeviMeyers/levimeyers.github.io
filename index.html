@@ -14,6 +14,9 @@
 <body style="background-color: #232460">
 
 <aside>
+    <a href="index.html" id="menu">MENU
+        <i class="fa-solid fa-bars"></i>
+    </a>
     <a href="deltarune.html" title="DELTARUNE" id=selectedGame>
         <img src="graphics/icon_deltarune.png" alt="DELTARUNE">
     </a>
@@ -113,18 +116,18 @@
         </div>
     </form>
     <form>
-        <div>
-            <p>Rounds:</p>
-            <div class="numController">
-                <button type="button" class="numController" value="decrease"
-                onclick="numController(this, false, 5, 5, 100)"></button>
-                <span class="numController" id="rounds">10</span>
-                <button type="button" class="numController" value="increase"
-                onclick="numController(this, true, 5, 5, 100)"></button>
-            </div>
-        </div>
+<!--        <div>-->
+<!--            <p>Rounds:</p>-->
+<!--            <div class="numController">-->
+<!--                <button type="button" class="numController" value="decrease"-->
+<!--                onclick="numController(this, false, 5, 5, 100)"></button>-->
+<!--                <span class="numController" id="rounds">10</span>-->
+<!--                <button type="button" class="numController" value="increase"-->
+<!--                onclick="numController(this, true, 5, 5, 100)"></button>-->
+<!--            </div>-->
+<!--        </div>-->
     </form>
-    <button class="next" onclick="collectSettings()" type="submit">START</button>
+    <button class="next" onclick="runQuiz()" type="submit">START</button>
 </div>
 
 <div class="main game deltarune">
@@ -138,9 +141,9 @@
         <p id="prompt">What is the name of this track?</p>
     </div>
     <div id="answers">
-        <button class="choice">Answer 1</button>
-        <button class="choice">Answer 2</button>
-        <button class="choice">Answer 3</button>
+        <button class="choice">Loading...</button>
+        <button class="choice">Loading...</button>
+        <button class="choice">Loading...</button>
 <!--        when switching to text entry, set display: flex manually and use element.focus() -->
         <label id="gameTextEntry" style="display: none">
             <textarea autocomplete="off" spellcheck="false" placeholder="Type answer here..."></textarea>
@@ -150,6 +153,8 @@
     <button class="next" hidden>NEXT</button>
 </div>
 <small>Concept artwork by Temmie Chang</small>
+
+<div id="transition" style="background-color: #232460"></div>
 
 </body>
 </html>

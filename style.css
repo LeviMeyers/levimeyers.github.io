@@ -11,6 +11,10 @@
     font-family: "8bitoperator JVE";
     src: url(graphics/8bitoperator_jve.ttf);
 }
+@font-face {
+    font-family: "8bitoperator Plus";
+    src: url(graphics/8bitOperatorPlus-Regular.ttf);
+}
 
 body {
     margin: 0;
@@ -50,12 +54,27 @@ aside a img {
     width: 90%;
     background-color: var(--accent-green);
 }
+aside #menu {
+    border-radius: 0;
+    width: 60px;
+    position: fixed;
+    top: 0;
+    background-color: var(--main-grey-dark);
+    transition: 0.2s;
+}
+aside #menu:hover {
+    background-color: var(--accent-green);
+}
+aside #menu * {
+    display: none;
+}
 
 * {
     font-family: "8bitoperator JVE", sans-serif;
     font-weight: normal;
     font-size: 25px;
     color: white;
+    text-decoration: none;
 }
 p {
     max-height: 200px;
@@ -112,12 +131,11 @@ h1[hidden] {
 }
 
 .settings {
-    display: none;
     padding-bottom: 100px;
 }
 
 .game {
-    /*display: none;*/
+    display: none;
 }
 
 form {
@@ -348,11 +366,9 @@ span.numController {
 }
 
 .next {
-    font-size: 50px;
-    max-height: 80px;
-    max-width: 320px;
-    min-width: 270px;
-    border: solid white 5px;
+    font-size: max(45px, 3.2vw);
+    width: max(200px, 17vw);
+    border: solid white 4px;
     background-color: var(--main-grey);
     margin-bottom: 0;
     position: fixed;
@@ -361,7 +377,6 @@ span.numController {
 }
 button.next:hover {
     color: white;
-    border: solid white 5px;
     background-color: var(--accent-green-dark);
     transition: transform 0.1s linear, background-color 0.1s;
 }
@@ -533,6 +548,18 @@ small {
     overflow: hidden;
 }
 
+#transition {
+    rotate: 10deg;
+    z-index: 15;
+    position: fixed;
+    left: -20vw;
+    top: -20vw;
+    height: 300%;
+    min-width: 0;
+    padding: 0;
+    transition: 1s ease-in-out;
+}
+
 /* ^^ UNIVERSAL ^^ */
 
 #chapterList {
@@ -553,32 +580,35 @@ small {
 
     aside {
         position: fixed;
+        background-color: transparent;
         top: 0;
         width: 100%;
-        height: 70px;
+        height: 20px;
         flex-direction: row;
-        box-shadow: 0 20px 40px 19px rgba(0, 0, 0, 0.30);
+        box-shadow: none;
     }
     aside a {
-        height: 50px;
-        transition: height 0.2s;
+        display: none;
     }
-    aside a:hover {
-        height: 90%;
-        width: auto;
+    aside #menu {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        display: flex;
+        color: transparent;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
     }
-    aside a img {
-        width: auto;
-        height: 100%;
-    }
-    #selectedGame {
-        height: 90%;
-        width: auto;
+    aside #menu * {
+        display: block;
+        position: absolute;
+        left: 5px;
     }
 
     .main {
         margin-left: 0;
-        padding-top: 90px;
+        padding-top: 60px;
     }
 
     div[hidden] {
@@ -594,6 +624,11 @@ small {
 
     .deltarune {
         background-image: none;
+    }
+
+    #transition {
+        left: -40vw;
+        top: -40vw;
     }
 }
 /* Background caption breakpoint */

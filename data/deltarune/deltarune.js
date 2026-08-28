@@ -5,7 +5,6 @@ let unlistedTracks = false;
 let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
-let rounds = 10;
 
 let trackListCopy;
 
@@ -40,11 +39,15 @@ function collectSettings() {
             difficulty = 2;
             break;
     }
-
-    rounds = Number(document.getElementById("rounds").textContent);
 }
 
 async function runQuiz() {
+    collectSettings();
+
+    await transitionStart();
+    document.querySelector(".settings").style.display = "none";
+    document.querySelector(".game").style.display = "flex";
+
     if (chapters.includes(1)) {
         await queueTSV("data/deltarune/chapter1.tsv");
         if (!unlistedTracks) {
@@ -52,7 +55,7 @@ async function runQuiz() {
         }
     }
 
-    for (let i = 0; i < rounds; i++) {
+    for (let i = 0; i < trackList.length; i++) {
         // must be sent to quiz module
         trackListCopy = trackList.slice();
 
@@ -62,10 +65,11 @@ async function runQuiz() {
     // after all rounds are complete, show results screen
 }
 
-async function initQuiz() {
-    await queueTSV("data/deltarune/chapter1.tsv");
-
-    trackListCopy = trackList.slice();
+async function testClick() {
+    const currentPlayer = document.querySelector("#infoDiv div *");
+    await sleep(5000);
+    currentPlayer.click();
+    console.log("clicked");
 }
 
 // CORE //
@@ -77,6 +81,7 @@ let textInput;
 // runs on page load (mostly eventListener assignments)
 function onLoad() {
     localPlayer = document.querySelector("audio");
+    const nextButton = document.querySelector(".game button.next");
 
     const modeInputs = document.getElementsByTagName("form").item(1)
         .getElementsByTagName("input");
@@ -86,6 +91,10 @@ function onLoad() {
 
     const textAreas = document.getElementsByTagName("textarea");
     for (const input of textAreas) {
+        input.addEventListener("input", function() {
+            this.style.height = "1em";
+            this.style.height = this.scrollHeight - 20 + "px";
+        })
         input.addEventListener("keydown", event => {
             if (event.code === "Enter") {
                 event.preventDefault();
@@ -96,11 +105,13 @@ function onLoad() {
                 }
             }
         })
-        input.addEventListener("input", function() {
-            this.style.height = "1em";
-            this.style.height = this.scrollHeight - 20 + "px";
-        })
     }
+    document.addEventListener("keydown", event => {
+        if (event.code === "Enter" && !(nextButton.hidden)) {
+            event.preventDefault();
+            nextButton.click();
+        }
+    });
 }
 document.addEventListener("DOMContentLoaded", onLoad);
 
@@ -387,9 +398,12 @@ async function quizRound(game, difficulty, mode) {
         setEmbedPlayer("local", normalizeUnlisted(chosenTrack.trackName), game);
     }
 
+    await transitionEnd();
+
     await resolveMultChoiceRound();
     await resetRound();
     console.log("round complete");
+
 }
 // return num points earned
 
@@ -462,7 +476,6 @@ function resolveMultChoiceRound() {
     })
 }
 
-
 async function resetRound() {
     const nextButton = document.querySelector(".game button.next");
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
@@ -521,4 +534,25 @@ function normalizeUnlisted(trackName) {
     } else {
         return trackName;
     }
+}
+
+async function transitionStart() {
+    const transitionElement = document.getElementById("transition");
+
+    transitionElement.style.minWidth = "200vw";
+    await sleep(1000);
+}
+
+async function transitionEnd() {
+    const transitionElement = document.getElementById("transition");
+
+    await sleep(400);
+    transitionElement.style.transform = "translate(200vw)";
+    await sleep(1000);
+
+    transitionElement.style.display = "none";
+    transitionElement.style.transform = null;
+    transitionElement.style.minWidth = null;
+    await sleep(1000);
+    transitionElement.style.display = null;
 }
