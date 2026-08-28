@@ -55,10 +55,10 @@ async function runQuiz() {
         }
     }
 
-    for (let i = 0; i < trackList.length; i++) {
-        // must be sent to quiz module
-        trackListCopy = trackList.slice();
+    // must be sent to quiz module
+    trackListCopy = trackList.slice();
 
+    while (trackList.length > 0) {
         await quizRound("deltarune", difficulty, "trackName");
     }
     console.log("rounds exhausted");
@@ -360,6 +360,8 @@ let chosenTrack;
 
 let correctButton;
 
+let transitionStarted = false;
+
 // filePath: string = must be a tsv file
 async function queueTSV(filePath) {
     const data = await d3.tsv(filePath, (row => { // https://d3js.org/d3-fetch#dsv
@@ -398,12 +400,12 @@ async function quizRound(game, difficulty, mode) {
         setEmbedPlayer("local", normalizeUnlisted(chosenTrack.trackName), game);
     }
 
-    await transitionEnd();
+    if (transitionStarted) {
+        await transitionEnd();
+    }
 
     await resolveMultChoiceRound();
     await resetRound();
-    console.log("round complete");
-
 }
 // return num points earned
 
@@ -540,14 +542,15 @@ async function transitionStart() {
     const transitionElement = document.getElementById("transition");
 
     transitionElement.style.minWidth = "200vw";
-    await sleep(1000);
+    transitionStarted = true;
+    await sleep(1400);
 }
 
 async function transitionEnd() {
     const transitionElement = document.getElementById("transition");
 
-    await sleep(400);
     transitionElement.style.transform = "translate(200vw)";
+    transitionStarted = false;
     await sleep(1000);
 
     transitionElement.style.display = "none";

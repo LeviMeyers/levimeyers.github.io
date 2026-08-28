@@ -611,11 +611,18 @@ small {
         padding-top: 60px;
     }
 
+    form {
+        row-gap: 10px;
+        column-gap: 0;
+    }
+
     div[hidden] {
-        max-width: 1000000px;
         max-height: 0;
         overflow: hidden;
         padding: 0;
+    }
+    #spoilerWarning {
+        left: 0;
     }
 
     #infoDiv h1 {
