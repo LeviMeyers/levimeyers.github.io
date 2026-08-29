@@ -13,8 +13,9 @@ Checklist is currently only for Deltarune (first game on the list). More will be
   - Prompt: ~~track name~~, motif, location played
   - ~~Multiple choice: 3+ buttons, answer feedback on buttons after clicked~~
   - / Text entry: entry box, answer feedback after clicked
-  - Timing function + points scored
+  - ~~Timing function + points scored~~
   - ~~Next button~~
+  - Results screen
 - ~~Song info data collected from wikis -> converted to TSV -> read by JS~~
 - ~~Song playback using Bandcamp widget~~
   - ~~Create iframe using generalized Bandcamp embed code, replace trackid~~
