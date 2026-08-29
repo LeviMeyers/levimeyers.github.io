@@ -4,9 +4,7 @@ let chapters = [1, 2, 3, 4];
 let unlistedTracks = false;
 let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
-let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
-
-let trackListCopy;
+let difficulty = 2; // 0 = easy; 1 = medium; 2 = hard
 
 function collectSettings() {
     chapters = [];
@@ -27,17 +25,19 @@ function collectSettings() {
     const modeInput = document.querySelector("input[name=quizMode]:checked");
     mode = modeInput.value;
 
-    const diff = document.querySelector("input[name=difficulty]:checked");
-    switch(diff.value) {
-        case "easy":
-            difficulty = 0;
-            break;
-        case "medium":
-            difficulty = 1;
-            break;
-        case "hard":
-            difficulty = 2;
-            break;
+    if (mode === "trackName") {
+        const diff = document.querySelector("input[name=difficulty]:checked");
+        switch(diff.value) {
+            case "easy":
+                difficulty = 0;
+                break;
+            case "medium":
+                difficulty = 1;
+                break;
+            case "hard":
+                difficulty = 2;
+                break;
+        }
     }
 }
 
@@ -55,21 +55,12 @@ async function runQuiz() {
         }
     }
 
-    // must be sent to quiz module
-    trackListCopy = trackList.slice();
-
+    prepareQuiz(isTextEntry, difficulty);
     while (trackList.length > 0) {
         await quizRound("deltarune", difficulty, "trackName");
     }
     console.log("rounds exhausted");
     // after all rounds are complete, show results screen
-}
-
-async function testClick() {
-    const currentPlayer = document.querySelector("#infoDiv div *");
-    await sleep(5000);
-    currentPlayer.click();
-    console.log("clicked");
 }
 
 // CORE //
@@ -355,12 +346,33 @@ function setEmbedPlayer(source, id, game) {
 
 // trackList must be accessible by other modules
 let trackList = [];
+let trackListCopy = [];
 let chosenTrackIndex;
 let chosenTrack;
-
 let correctButton;
 
 let transitionStarted = false;
+
+let timerInterval;
+let milliseconds = 0;
+
+let questionCorrect = false;
+let points = 0;
+let correctAnswers = 0;
+
+function prepareQuiz(textEntry, difficulty) {
+    points = 0;
+    correctAnswers = 0;
+
+    trackListCopy = trackList.slice();
+
+    if (!(isTextEntry) && difficulty === 2) { // if hard multiple choice, add extra button to list
+        const extraButton = document.createElement("button");
+        extraButton.classList.add("choice");
+        document.getElementById("answers").appendChild(extraButton);
+    }
+}
+
 
 // filePath: string = must be a tsv file
 async function queueTSV(filePath) {
@@ -390,6 +402,7 @@ async function quizRound(game, difficulty, mode) {
     chosenTrack = trackList[chosenTrackIndex];
     console.log(chosenTrack);
 
+    questionCorrect = false;
     populateMultipleChoice(difficulty);
 
     if (chosenTrack.bandcampID !== 0) {
@@ -403,11 +416,15 @@ async function quizRound(game, difficulty, mode) {
     if (transitionStarted) {
         await transitionEnd();
     }
+    milliseconds = 0;
+    timerInterval = setInterval(() => {
+        milliseconds++;
+    }, 1);
 
     await resolveMultChoiceRound();
+    tallyPoints(false, difficulty, questionCorrect);
     await resetRound();
 }
-// return num points earned
 
 function populateMultipleChoice(difficulty) {
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
@@ -461,6 +478,8 @@ function resolveMultChoiceRound() {
 
             if (!(this === correctButton)) {
                 this.style.color = "var(--soft-red)";
+            } else {
+                questionCorrect = true;
             }
 
             correctButton.style.border = "solid 3px var(--accent-green-dark)";
@@ -505,6 +524,62 @@ async function resetRound() {
 
         nextButton.addEventListener("click", clickDetector);
     })
+}
+
+// textEntry: boolean = isTextEntry
+// difficulty: number = 0/1/2
+// correct: boolean = questionCorrect
+function tallyPoints(textEntry, difficulty, correct) {
+    let pts = 0;
+    clearInterval(timerInterval);
+
+    if (correct) {
+        correctAnswers++;
+
+        if (textEntry) {
+            pts = 250;
+        } else {
+            switch (difficulty) {
+                case 0:
+                    pts = 75;
+                    break;
+                case 1:
+                    pts = 100;
+                    break;
+                case 2:
+                    pts = 125;
+                    break;
+            }
+        }
+
+        if (milliseconds <= 0 ) {
+            pts = 0;
+        }
+        else if (milliseconds <= 500) {
+            pts += 100;
+        } else if (milliseconds < 4000) {
+            pts += Math.round((100 - (milliseconds / 40)));
+        }
+    }
+
+    points += pts;
+    if (pts > 0) {
+        addPopupValue("pointDisplay", "+" + pts + " POINTS");
+    }
+}
+
+// divID: string
+// value: string
+function addPopupValue(divID, value) {
+    const div = document.getElementById(divID);
+    const popup = div.appendChild(document.createElement("p"));
+    popup.textContent = value;
+
+    setTimeout(async function() {
+        popup.hidden = true;
+        await sleep(500);
+        popup.remove();
+    }, 5000);
 }
 
 // array: array
