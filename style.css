@@ -566,7 +566,7 @@ small {
     display: flex;
     flex-direction: column-reverse;
     justify-content: flex-end;
-    max-height: 130px;
+    max-height: 140px;
     overflow: hidden;
     overflow-x: visible;
     position: fixed;
@@ -577,6 +577,7 @@ small {
     transition: 1s ease-out;
 }
 #pointDisplay p {
+    margin-top: 5px;
     margin-bottom: 5px;
 }
 #pointDisplay p[hidden] {

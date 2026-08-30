@@ -353,8 +353,7 @@ let correctButton;
 
 let transitionStarted = false;
 
-let timerInterval;
-let milliseconds = 0;
+let initTime
 
 let questionCorrect = false;
 let points = 0;
@@ -416,10 +415,7 @@ async function quizRound(game, difficulty, mode) {
     if (transitionStarted) {
         await transitionEnd();
     }
-    milliseconds = 0;
-    timerInterval = setInterval(() => {
-        milliseconds++;
-    }, 1);
+    initTime = Date.now();
 
     await resolveMultChoiceRound();
     tallyPoints(false, difficulty, questionCorrect);
@@ -530,8 +526,10 @@ async function resetRound() {
 // difficulty: number = 0/1/2
 // correct: boolean = questionCorrect
 function tallyPoints(textEntry, difficulty, correct) {
+    const ms = Date.now() - initTime;
     let pts = 0;
-    clearInterval(timerInterval);
+
+    console.log("TIME: " + ms);
 
     if (correct) {
         correctAnswers++;
@@ -552,13 +550,13 @@ function tallyPoints(textEntry, difficulty, correct) {
             }
         }
 
-        if (milliseconds <= 0 ) {
+        if (ms <= 0 ) {
             pts = 0;
         }
-        else if (milliseconds <= 500) {
+        else if (ms <= 2000) {
             pts += 100;
-        } else if (milliseconds < 4000) {
-            pts += Math.round((100 - (milliseconds / 40)));
+        } else if (ms < 12000) {
+            pts += Math.round((100 - ((ms - 2000) / 100)));
         }
     }
 
