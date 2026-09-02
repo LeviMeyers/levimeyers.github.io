@@ -4,7 +4,7 @@ let chapters = [1, 2, 3, 4];
 let unlistedTracks = false;
 let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
-let difficulty = 2; // 0 = easy; 1 = medium; 2 = hard
+let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 
 function collectSettings() {
     chapters = [];
@@ -158,9 +158,9 @@ function maintainChecklist(checklistId, currentCheckbox) {
 function checkModesCompatible() {
     const textEntry = document.querySelector("input[value=textEntry]")
     const locationPlayed = document.querySelector("input[value=locationPlayed]")
+    const motif = document.querySelector("input[value=motif]")
     const trackName = document.querySelector("input[value=trackName]")
     const difficultyDiv = document.getElementById("diffWrapper");
-    const spoilerWarning = document.getElementById("spoilerWarning");
 
     if (textEntry.checked) {
         locationPlayed.disabled = true;
@@ -172,12 +172,11 @@ function checkModesCompatible() {
         locationPlayed.disabled = false;
     }
 
-    if (!trackName.checked || textEntry.checked) {
+    if (motif.checked || textEntry.checked) {
         difficultyDiv.hidden = true;
     } else {
         difficultyDiv.hidden = false;
     }
-    spoilerWarning.hidden = !locationPlayed.checked; // if location played is selected, show spoiler warning
 }
 
 // button: this
@@ -418,7 +417,7 @@ async function quizRound(game, difficulty, mode) {
     initTime = Date.now();
 
     await resolveMultChoiceRound();
-    tallyPoints(false, difficulty, questionCorrect);
+    tallyPoints(mode, difficulty, questionCorrect);
     await resetRound();
 }
 
@@ -522,41 +521,55 @@ async function resetRound() {
     })
 }
 
-// textEntry: boolean = isTextEntry
+// maps difficulties (0/1/2) to default points awarded on correct answer
+const difficultyToPoints = new Map([
+    [0, 75],
+    [1, 100],
+    [2, 125]
+])
+
+// mode: string = "trackName", "locationPlayed", "motif", "textEntry"
 // difficulty: number = 0/1/2
 // correct: boolean = questionCorrect
-function tallyPoints(textEntry, difficulty, correct) {
+function tallyPoints(mode, difficulty,  correct) {
     const ms = Date.now() - initTime;
+    let perfectMs;
     let pts = 0;
 
-    console.log("TIME: " + ms);
+    console.log(ms);
+
+    switch (mode) {
+        case "trackName":
+            perfectMs = 2000;
+            break;
+        case "locationPlayed":
+            perfectMs = 3000;
+            break;
+        case "motif":
+            perfectMs = 5000;
+            difficulty = 2; // test if this works
+            break;
+        case "textEntry":
+            // assign based on length of normalizedAnswer (should be a global variable)
+            break;
+    }
 
     if (correct) {
         correctAnswers++;
 
-        if (textEntry) {
+        if (mode === "textEntry") {
             pts = 250;
         } else {
-            switch (difficulty) {
-                case 0:
-                    pts = 75;
-                    break;
-                case 1:
-                    pts = 100;
-                    break;
-                case 2:
-                    pts = 125;
-                    break;
-            }
+            pts = difficultyToPoints.get(difficulty);
         }
 
         if (ms <= 0 ) {
             pts = 0;
         }
-        else if (ms <= 2000) {
+        else if (ms <= perfectMs) {
             pts += 100;
-        } else if (ms < 12000) {
-            pts += Math.round((100 - ((ms - 2000) / 100)));
+        } else if (ms < (perfectMs + 10000)) {
+            pts += Math.round((100 - ((ms - perfectMs) / 100)));
         }
     }
 

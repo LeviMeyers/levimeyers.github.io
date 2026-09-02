@@ -83,7 +83,13 @@
                     <input type="radio" name="quizMode" value="trackName" checked="checked">
                     <span class="checkmark radiomark"></span>
                 </label>
-                <label class="checkContainer">Location played
+                <label class="checkContainer">
+                    <span class="tooltipRoot" style="color: var(--soft-red)">!
+                        <span class="tooltip">
+                            <span style="color: var(--soft-red)">SPOILER WARNING<br></span>
+                            Reused tracks may show their locations in unselected chapters
+                        </span>
+                    </span>Location played
                     <input type="radio" name="quizMode" value="locationPlayed">
                     <span class="checkmark radiomark"></span>
                 </label>
@@ -109,10 +115,6 @@
                     <span class="checkmark radiomark"></span>
                 </label>
             </div>
-        </div>
-        <div id="spoilerWarning" hidden>
-            <p style="color:var(--soft-red); margin-bottom: 20px">SPOILER WARNING</p>
-            <p style="margin-bottom: 0">Reused tracks may show their locations in unselected chapters</p>
         </div>
     </form>
     <form>
