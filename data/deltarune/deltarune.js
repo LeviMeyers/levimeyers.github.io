@@ -87,7 +87,7 @@ function onLoad() {
             this.style.height = this.scrollHeight - 20 + "px";
         })
         input.addEventListener("keydown", event => {
-            if (event.code === "Enter") {
+            if (event.key === "Enter") {
                 event.preventDefault();
 
                 if (input.parentElement.id === "gameTextEntry") {
@@ -98,7 +98,7 @@ function onLoad() {
         })
     }
     document.addEventListener("keydown", event => {
-        if (event.code === "Enter" && !(nextButton.hidden)) {
+        if (event.key === "Enter" && !(nextButton.hidden)) {
             event.preventDefault();
             nextButton.click();
         }
@@ -426,6 +426,8 @@ function populateMultipleChoice(difficulty) {
     let trackListPull = trackList;
     let chosenTrackIndexPull = chosenTrackIndex;
 
+    addKeyInputToList(buttons);
+
     // if track list is small enough to cause trivial track comparisons, switch references to an untouched copy
     if (trackList.length < Math.floor(trackListCopy.length * 0.25)) {
         trackListPull = trackListCopy;
@@ -504,7 +506,12 @@ async function resetRound() {
             nextButton.removeEventListener("click", clickDetector);
             nextButton.hidden = true;
 
-            await toggleNameReveal();
+            if (trackList.length > 0) {
+                await toggleNameReveal();
+            } else {
+                await transitionStart();
+                setEmbedPlayer();
+            }
 
             document.querySelector("#infoDiv h1").textContent = "";
             document.querySelector("#gameTextEntry textarea").textContent = "";
@@ -591,6 +598,19 @@ function addPopupValue(divID, value) {
         await sleep(500);
         popup.remove();
     }, 5000);
+}
+
+// elements: array/list/whatever of HTML elements
+function addKeyInputToList(elements) {
+    for (let i = 1; i <= elements.length; i++) {
+        const item = elements[i - 1];
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "" + i) {
+                item.click();
+            }
+        })
+    }
 }
 
 // array: array

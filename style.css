@@ -103,6 +103,8 @@ p[hidden] {
 h1 {
     display: block;
     text-align: center;
+    justify-self: center;
+    text-shadow: 0 3px 0 var(--main-grey-dark);
     margin-top: 0;
     margin-bottom: 0.5em;
     font-size: clamp(45px, 13.5vw, 60px);
@@ -113,6 +115,16 @@ h1[hidden] {
     max-height: 0;
     overflow: hidden;
     margin: 0;
+}
+h2 {
+    display: block;
+    text-align: center;
+    justify-self: center;
+    text-shadow: 0 3px 0 var(--main-grey-dark);
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: clamp(80px, 14vw, 95px);
+    transition: 0.2s ease-out;
 }
 
 .main {
@@ -134,10 +146,14 @@ h1[hidden] {
 
 .settings {
     padding-bottom: 100px;
+    display: none;
 }
 
 .game {
     display: none;
+}
+.results {
+    /*display: none;*/
 }
 
 form {
@@ -161,18 +177,47 @@ div[hidden] {
     overflow: hidden;
     padding: 0;
 }
-#infoDiv {
+.infoDiv {
     display: flex;
     justify-content: center;
     padding: min(20px, 5%);
     width: min(700px, 90%);
 }
-#infoDiv h1 {
-    justify-self: center;
-    text-shadow: 0 3px 0 var(--main-grey-dark);
+.infoDiv h1 {
+    height: auto;
 }
-#infoDiv p {
+
+.infoDiv p {
     font-size: 27px;
+}
+
+#results {
+    justify-content: center;
+    padding: min(40px, 5%);
+    width: min(500px, 90%);
+    display: grid;
+    grid-template-columns: 0.3fr 0.7fr;
+}
+#results div {
+    padding: 0;
+    background: transparent;
+    align-items: start;
+}
+#results p {
+    margin-bottom: 5px;
+}
+#results h1 {
+    margin-bottom: 0.6em;
+}
+
+div #rank {
+    align-items: center;
+}
+#rank p {
+    font-size: 35px;
+}
+#rank h2 {
+    margin-bottom: 0;
 }
 
 /* cool golden glowy text
@@ -390,18 +435,6 @@ button.next[hidden] {
     border: none;
     box-shadow: none;
 }
-/* add using JS */
-/*button.correct {*/
-/*    background-color: var(--accent-green);*/
-/*    border: solid var(--accent-green) 3px;*/
-/*}*/
-/*button.incorrect {*/
-/*    border: solid var(--soft-red) 3px;*/
-/*    background-color: var(--soft-red);*/
-/*}*/
-/*all buttons after one clicked {*/
-/*    cursor: default;*/
-/*}*/
 
 textarea {
     position: relative;
@@ -419,18 +452,6 @@ textarea:focus {
 textarea:not([readonly]):focus {
     background-color: var(--main-grey-dark);
 }
-
-/* JS */
-/*textarea.correct {*/
-/*    color: var(--accent-green);*/
-/*    border-color: var(--accent-green);*/
-/*    this.setAttribute("readonly", "readonly");*/
-/*}*/
-/*textarea.incorrect {*/
-/*    color: var(--soft-red);*/
-/*    border-color: var(--soft-red);*/
-/*    this.setAttribute("readonly", "readonly");*/
-/*}*/
 
 small {
     position: fixed;
@@ -661,10 +682,6 @@ small {
         max-height: 0;
         overflow: hidden;
         padding: 0;
-    }
-
-    #infoDiv h1 {
-        height: auto;
     }
 
     .deltarune {
