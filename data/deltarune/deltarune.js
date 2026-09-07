@@ -6,6 +6,8 @@ let mode = "trackName"; // trackName; locationPlayed; motif (partially game-depe
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 
+let pointsElement;
+
 function collectSettings() {
     chapters = [];
     const chapSelectInputs = document.getElementById("chapterList")
@@ -103,6 +105,8 @@ function onLoad() {
             nextButton.click();
         }
     });
+
+    pointsElement = document.getElementById("points");
 }
 document.addEventListener("DOMContentLoaded", onLoad);
 
@@ -664,4 +668,35 @@ async function transitionEnd() {
     transitionElement.style.minWidth = null;
     await sleep(1000);
     transitionElement.style.display = null;
+}
+
+// this function kinda sucks but it's 2 AM and it works
+// main issue is incrementing by a non-multiple of 400 will leave the number higher than 400 by the time it switches
+// to the exponential function (in this case handled with deltaOver400)
+// the core idea is that the exponential should iterate 400 or less times according to the function
+// 1.1^(i - (distance from value before switching to exponential) - 56) + 1
+async function accumNumber(numElement, target) {
+    let currentVal = Number(numElement.textContent);
+    let deltaOver400 = 0;
+
+    let i = 0;
+    while (currentVal < target) {
+        if (currentVal < (target - 400)) {               // if distance to target is greater than 400,
+            numElement.textContent = currentVal + 34;    // increase by 34 every millisecond
+            await sleep(1);
+
+            deltaOver400 = Number(numElement.textContent) - (target - 400);
+        } else {
+            numElement.textContent = currentVal + 1;     // otherwise, increase by 1 every t milliseconds
+            if (deltaOver400 > 0) {                      // where t = this exponential function
+                await sleep(1.1 ** (i - (344 - deltaOver400)) + 1);
+            } else {
+                await sleep(1.1 ** (i - (target - 56)) + 1)
+            }
+
+            i++;
+        }
+
+        currentVal = Number(numElement.textContent);
+    }
 }

@@ -197,6 +197,9 @@ div[hidden] {
     width: min(500px, 90%);
     display: grid;
     grid-template-columns: 0.3fr 0.7fr;
+    grid-template-areas:
+    "points-box rank-box"
+    "accuracy-box rank-box";
 }
 #results div {
     padding: 0;
@@ -210,13 +213,14 @@ div[hidden] {
     margin-bottom: 0.6em;
 }
 
-div #rank {
+div #rankDiv {
+    grid-area: rank-box;
     align-items: center;
 }
-#rank p {
+#rankDiv p {
     font-size: 35px;
 }
-#rank h2 {
+#rankDiv h2 {
     margin-bottom: 0;
 }
 
@@ -682,6 +686,20 @@ small {
         max-height: 0;
         overflow: hidden;
         padding: 0;
+    }
+
+    #results {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+        "points-box"
+        "accuracy-box"
+        "rank-box";
+    }
+    #results div {
+        align-items: center;
+    }
+    #rankDiv {
+        margin-top: 31px;
     }
 
     .deltarune {
