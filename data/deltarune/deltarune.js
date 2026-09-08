@@ -6,7 +6,7 @@ let mode = "trackName"; // trackName; locationPlayed; motif (partially game-depe
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 
-let pointsElement;
+let testElement;
 
 function collectSettings() {
     chapters = [];
@@ -57,12 +57,16 @@ async function runQuiz() {
         }
     }
 
-    prepareQuiz(isTextEntry, difficulty);
+    prepareQuiz(isTextEntry, difficulty, mode);
     while (trackList.length > 0) {
-        await quizRound("deltarune", difficulty, "trackName");
+        await quizRound("deltarune"); // transitionStart() called by final round
     }
-    console.log("rounds exhausted");
-    // after all rounds are complete, show results screen
+
+    document.querySelector(".game").style.display = "none";
+    document.querySelector(".results").style.display = "flex";
+    await transitionEnd();
+
+    await displayResults();
 }
 
 // CORE //
@@ -105,8 +109,6 @@ function onLoad() {
             nextButton.click();
         }
     });
-
-    pointsElement = document.getElementById("points");
 }
 document.addEventListener("DOMContentLoaded", onLoad);
 
@@ -130,7 +132,7 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onYoutubeEmbedStateChange(event) {
-    const currentEmbedControl = document.querySelector("#infoDiv div span");
+    const currentEmbedControl = document.querySelector(".infoDiv div span");
 
     // https://developers.google.com/youtube/iframe_api_reference#Events
     if (event.data === 0) {
@@ -260,8 +262,8 @@ function collectTextInput() {
 }
 
 async function toggleNameReveal() {
-    const trackHeader = document.querySelector("#infoDiv h1");
-    const prompt = document.querySelector("#infoDiv p");
+    const trackHeader = document.querySelector(".infoDiv h1");
+    const prompt = document.querySelector(".infoDiv p");
 
     prompt.hidden = !prompt.hidden;
     await sleep(150);
@@ -283,9 +285,9 @@ let prevEmbed;
 // id: string/number = youtube video ID, bandcamp track ID, or ogg name
 // game: string = only applicable if calling as ogg. should match a directory under music/
 function setEmbedPlayer(source, id, game) {
-    const playerDiv = document.querySelector("#infoDiv div");
+    const playerDiv = document.querySelector(".infoDiv div");
 
-    prevEmbed = document.querySelector("#infoDiv div *");  // stop + remove previous embed
+    prevEmbed = document.querySelector(".infoDiv div *");  // stop + remove previous embed
     if (!(prevEmbed == null)) {
         prevEmbed.remove();
     }
@@ -353,6 +355,8 @@ let trackListCopy = [];
 let chosenTrackIndex;
 let chosenTrack;
 let correctButton;
+// should be module-side variables for isTextEntry, mode, and difficulty
+// use prepareQuiz parameters to set these
 
 let transitionStarted = false;
 
@@ -362,7 +366,7 @@ let questionCorrect = false;
 let points = 0;
 let correctAnswers = 0;
 
-function prepareQuiz(textEntry, difficulty) {
+function prepareQuiz() {
     points = 0;
     correctAnswers = 0;
 
@@ -397,9 +401,7 @@ async function queueTSV(filePath) {
 }
 
 // game: string
-// difficulty: number = 0/1/2
-// mode: string = "trackName", "locationPlayed", "motif"
-async function quizRound(game, difficulty, mode) {
+async function quizRound(game) {
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
     chosenTrack = trackList[chosenTrackIndex];
     console.log(chosenTrack);
@@ -421,11 +423,11 @@ async function quizRound(game, difficulty, mode) {
     initTime = Date.now();
 
     await resolveMultChoiceRound();
-    tallyPoints(mode, difficulty, questionCorrect);
+    tallyPoints(questionCorrect);
     await resetRound();
 }
 
-function populateMultipleChoice(difficulty) {
+function populateMultipleChoice() {
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
     let trackListPull = trackList;
     let chosenTrackIndexPull = chosenTrackIndex;
@@ -467,6 +469,8 @@ function populateMultipleChoice(difficulty) {
     trackList.splice(chosenTrackIndex, 1);
 }
 
+// if embed player click event detection ever implemented, remember to remove focus from the element (blur()?)
+
 function resolveMultChoiceRound() {
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
 
@@ -486,7 +490,7 @@ function resolveMultChoiceRound() {
             correctButton.style.border = "solid 3px var(--accent-green-dark)";
             correctButton.style.color = "var(--accent-green-dark)";
 
-            document.querySelector("#infoDiv h1").textContent = chosenTrack.trackName;
+            document.querySelector(".infoDiv h1").textContent = chosenTrack.trackName;
             await toggleNameReveal();
 
             resolve();
@@ -517,7 +521,7 @@ async function resetRound() {
                 setEmbedPlayer();
             }
 
-            document.querySelector("#infoDiv h1").textContent = "";
+            document.querySelector(".infoDiv h1").textContent = "";
             document.querySelector("#gameTextEntry textarea").textContent = "";
             document.querySelector("#gameTextEntry textarea").attributeStyleMap.clear();
             buttons.forEach((button) => {
@@ -532,6 +536,30 @@ async function resetRound() {
     })
 }
 
+async function displayResults() {
+    const pointsElement = document.getElementById("points");
+    const accuracyElement = document.getElementById("accuracy");
+    const rankElement = document.getElementById("rank");
+
+    const accuracy = Math.round(100 * (correctAnswers / trackListCopy.length));
+    const maxPointsPossible = () => {
+        if (isTextEntry) {
+            return 350 * trackListCopy.length;
+        } else {
+            return (difficultyToPoints.get(difficulty) + 100) * trackListCopy.length;
+        }
+    }
+    console.log(maxPointsPossible());
+
+    await accumNumber(pointsElement, points);
+    await accumNumber(accuracyElement, accuracy);
+
+    // display rank as calculated by some other function:
+    // - set textContent of rankElement and rankElement.previousSibling
+    // - give rankElement proper styling id from map
+    // - remove hidden tag from rankElement
+}
+
 // maps difficulties (0/1/2) to default points awarded on correct answer
 const difficultyToPoints = new Map([
     [0, 75],
@@ -539,15 +567,11 @@ const difficultyToPoints = new Map([
     [2, 125]
 ])
 
-// mode: string = "trackName", "locationPlayed", "motif", "textEntry"
-// difficulty: number = 0/1/2
 // correct: boolean = questionCorrect
-function tallyPoints(mode, difficulty,  correct) {
+function tallyPoints(correct) {
     const ms = Date.now() - initTime;
     let perfectMs;
     let pts = 0;
-
-    console.log(ms);
 
     switch (mode) {
         case "trackName":
@@ -651,6 +675,8 @@ function normalizeUnlisted(trackName) {
 async function transitionStart() {
     const transitionElement = document.getElementById("transition");
 
+    transitionElement.style.display = null;
+    await sleep(1);
     transitionElement.style.minWidth = "200vw";
     transitionStarted = true;
     await sleep(1400);
@@ -666,33 +692,26 @@ async function transitionEnd() {
     transitionElement.style.display = "none";
     transitionElement.style.transform = null;
     transitionElement.style.minWidth = null;
-    await sleep(1000);
-    transitionElement.style.display = null;
 }
 
-// this function kinda sucks but it's 2 AM and it works
-// main issue is incrementing by a non-multiple of 400 will leave the number higher than 400 by the time it switches
-// to the exponential function (in this case handled with deltaOver400)
-// the core idea is that the exponential should iterate 400 or less times according to the function
-// 1.1^(i - (distance from value before switching to exponential) - 56) + 1
 async function accumNumber(numElement, target) {
+    const fastIncrement = 38;
+    const slowdownPoint = 350;
+    const slopeIntersection = 54; // raise to have smoother easing
+
     let currentVal = Number(numElement.textContent);
-    let deltaOver400 = 0;
+    let distFromTarget = target - currentVal;
 
     let i = 0;
     while (currentVal < target) {
-        if (currentVal < (target - 400)) {               // if distance to target is greater than 400,
-            numElement.textContent = currentVal + 34;    // increase by 34 every millisecond
+        if (currentVal < (target - slowdownPoint)) {
+            numElement.textContent = currentVal + fastIncrement;
             await sleep(1);
 
-            deltaOver400 = Number(numElement.textContent) - (target - 400);
+            distFromTarget = target - Number(numElement.textContent);
         } else {
-            numElement.textContent = currentVal + 1;     // otherwise, increase by 1 every t milliseconds
-            if (deltaOver400 > 0) {                      // where t = this exponential function
-                await sleep(1.1 ** (i - (344 - deltaOver400)) + 1);
-            } else {
-                await sleep(1.1 ** (i - (target - 56)) + 1)
-            }
+            numElement.textContent = currentVal + 1;
+            await sleep(1.1 ** (i -(distFromTarget - slopeIntersection)) + 1);
 
             i++;
         }

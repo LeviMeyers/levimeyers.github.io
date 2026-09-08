@@ -142,6 +142,7 @@ h2 {
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 0;
+    overflow: hidden; /* might cause issues. if this happens, chop overflow only when displaying results */
 }
 
 .settings {
@@ -214,6 +215,7 @@ div[hidden] {
 }
 
 div #rankDiv {
+    position: relative;
     grid-area: rank-box;
     align-items: center;
 }
@@ -222,6 +224,19 @@ div #rankDiv {
 }
 #rankDiv h2 {
     margin-bottom: 0;
+}
+#rank[hidden] {
+    font-size: 50vh;
+    opacity: 0;
+}
+#rank {
+    position: absolute;
+    margin-top: 40px;
+    opacity: 100;
+    transition: 0.5s ease-in;
+}
+#accuracy::after {
+    content: "%";
 }
 
 /* cool golden glowy text
