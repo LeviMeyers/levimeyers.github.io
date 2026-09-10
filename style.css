@@ -147,14 +147,14 @@ h2 {
 
 .settings {
     padding-bottom: 100px;
-    display: none;
+    /*display: none;*/
 }
 
 .game {
     display: none;
 }
 .results {
-    /*display: none;*/
+    display: none;
 }
 
 form {
