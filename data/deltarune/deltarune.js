@@ -549,7 +549,8 @@ async function displayResults() {
             return (difficultyToPoints.get(difficulty) + 100) * trackListCopy.length;
         }
     }
-    console.log(maxPointsPossible());
+    const perfectPercentage = 100 * (points / maxPointsPossible());
+    console.log(perfectPercentage);
 
     await accumNumber(pointsElement, points);
     await accumNumber(accuracyElement, accuracy);
