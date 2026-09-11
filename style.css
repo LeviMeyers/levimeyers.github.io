@@ -195,12 +195,12 @@ div[hidden] {
 #results {
     justify-content: center;
     padding: min(40px, 5%);
-    width: min(500px, 90%);
     display: grid;
-    grid-template-columns: 0.3fr 0.7fr;
+    /*grid-template-columns: 0.3fr 0.7fr;*/
     grid-template-areas:
     "points-box rank-box"
     "accuracy-box rank-box";
+    column-gap: 20px;
 }
 #results div {
     padding: 0;
@@ -215,6 +215,7 @@ div[hidden] {
 }
 
 div #rankDiv {
+    min-width: 300px;
     position: relative;
     grid-area: rank-box;
     align-items: center;
@@ -233,18 +234,61 @@ div #rankDiv {
     position: absolute;
     margin-top: 40px;
     opacity: 100;
-    transition: 0.5s ease-in;
+    transition: font-size 0.5s ease-in, opacity 0.5s ease-in;
 }
 #accuracy::after {
     content: "%";
 }
 
-/* cool golden glowy text
-color: transparent;
-background: linear-gradient(to top, #d6d6a7, var(--gold-yellow));
-background-clip: text;
-filter: drop-shadow(0 0 10px rgb(214 214 146 / 0.75));
- */
+/* RANK STYLES */
+.IMPOSSIBLE-rank {
+    color: transparent;
+    position: relative;
+    text-shadow: 0 3px 0 #7a7a7a;
+}
+.IMPOSSIBLE-rank::after {
+    content: "IMPOSSIBLE";
+    position: absolute;
+    left: 0;
+    color: transparent;
+    background: linear-gradient(to top, #ffffff, #a1a1a1);
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 7px rgb(255 255 255 / 0.75));
+}
+.P-rank { /* text shadow */
+    color: transparent;
+    position: relative;
+    text-shadow: 0 3px 0 #6a6a45;
+}
+.P-rank::after { /* actual display */
+    content: "P";
+    position: absolute;
+    left: 0;
+    color: transparent;
+    background: linear-gradient(to top, #dadac1, var(--gold-yellow));
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 7px rgb(214 214 146 / 0.75));
+}
+.S-rank {
+    color: transparent;
+    background: linear-gradient(to top, #c3daca, var(--accent-green));
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 4px 0 #344e3a);
+}
+.A-rank {
+    color: #f63a3a;
+    text-shadow: 0 3px 0 #5a3434;
+}
+.B-rank {
+    color: #496dfa;
+    text-shadow: 0 3px 0 #2e3865;
+}
+.LARPER-rank {
+    color: var(--main-grey);
+}
 
 #prompt {
     color: var(--gold-yellow);
@@ -704,6 +748,8 @@ small {
     }
 
     #results {
+        min-width: initial;
+        width: 90%;
         grid-template-columns: 1fr;
         grid-template-areas:
         "points-box"

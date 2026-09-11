@@ -539,26 +539,12 @@ async function resetRound() {
 async function displayResults() {
     const pointsElement = document.getElementById("points");
     const accuracyElement = document.getElementById("accuracy");
-    const rankElement = document.getElementById("rank");
 
     const accuracy = Math.round(100 * (correctAnswers / trackListCopy.length));
-    const maxPointsPossible = () => {
-        if (isTextEntry) {
-            return 350 * trackListCopy.length;
-        } else {
-            return (difficultyToPoints.get(difficulty) + 100) * trackListCopy.length;
-        }
-    }
-    const perfectPercentage = 100 * (points / maxPointsPossible());
-    console.log(perfectPercentage);
 
     await accumNumber(pointsElement, points);
     await accumNumber(accuracyElement, accuracy);
-
-    // display rank as calculated by some other function:
-    // - set textContent of rankElement and rankElement.previousSibling
-    // - give rankElement proper styling id from map
-    // - remove hidden tag from rankElement
+    calculateRank();
 }
 
 // maps difficulties (0/1/2) to default points awarded on correct answer
@@ -576,13 +562,13 @@ function tallyPoints(correct) {
 
     switch (mode) {
         case "trackName":
-            perfectMs = 2000;
-            break;
-        case "locationPlayed":
             perfectMs = 3000;
             break;
+        case "locationPlayed":
+            perfectMs = 7000;
+            break;
         case "motif":
-            perfectMs = 5000;
+            perfectMs = 8000;
             difficulty = 2; // test if this works
             break;
         case "textEntry":
@@ -613,6 +599,46 @@ function tallyPoints(correct) {
     if (pts > 0) {
         addPopupValue("pointDisplay", "+" + pts + " POINTS");
     }
+}
+
+// find a better way to mark correct answers first though lol
+// write another parameter that customizes the impossible rank
+function calculateRank(accuracy) {
+    const rankElement = document.getElementById("rank");
+    let rankTitle;
+
+    const maxPointsPossible = () => {
+        if (isTextEntry) {
+            return 350 * trackListCopy.length;
+        } else {
+            return (difficultyToPoints.get(difficulty) + 100) * trackListCopy.length;
+        }
+    }
+    const perfectPercentage = 100 * (points / maxPointsPossible());
+    console.log(perfectPercentage);
+
+    if (perfectPercentage > 98) {
+        rankTitle = "IMPOSSIBLE";
+    } else if (perfectPercentage >= 95 && accuracy >= 100) {
+        rankTitle = "P";
+    } else if (perfectPercentage >= 90) {
+        rankTitle = "S";
+    } else if (perfectPercentage >= 85) {
+        rankTitle = "A";
+    } else if (perfectPercentage >= 75) {
+        rankTitle = "B";
+    } else if (perfectPercentage >= 65) {
+        rankTitle = "C";
+    } else if (perfectPercentage > 40) {
+        rankTitle = "Z";
+    } else {
+        rankTitle = "LARPER";
+    }
+
+    rankElement.previousElementSibling.textContent = rankTitle;
+    rankElement.textContent = rankTitle;
+    rankElement.classList.add(rankTitle + "-rank");
+    rankElement.hidden = false;
 }
 
 // divID: string
