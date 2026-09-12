@@ -67,6 +67,7 @@ async function runQuiz() {
     await transitionEnd();
 
     await displayResults();
+    displayRank("TOBY FOX");
 }
 
 // CORE //
@@ -357,6 +358,7 @@ let chosenTrack;
 let correctButton;
 // should be module-side variables for isTextEntry, mode, and difficulty
 // use prepareQuiz parameters to set these
+let impossibleRank;
 
 let transitionStarted = false;
 
@@ -365,10 +367,12 @@ let initTime
 let questionCorrect = false;
 let points = 0;
 let correctAnswers = 0;
+let accuracy;
 
-function prepareQuiz() {
+function prepareQuiz(impossRank) {
     points = 0;
     correctAnswers = 0;
+    impossibleRank = impossRank ?? "IMPOSSIBLE";
 
     trackListCopy = trackList.slice();
 
@@ -435,7 +439,7 @@ function populateMultipleChoice() {
     addKeyInputToList(buttons);
 
     // if track list is small enough to cause trivial track comparisons, switch references to an untouched copy
-    if (trackList.length < Math.floor(trackListCopy.length * 0.25)) {
+    if (trackList.length < Math.floor(trackListCopy.length * 0.20)) {
         trackListPull = trackListCopy;
         chosenTrackIndexPull = trackListPull.indexOf(chosenTrack);
     }
@@ -443,7 +447,6 @@ function populateMultipleChoice() {
     // give a random button the correct track title + "correct" id and remove it from the available buttons list
     correctButton = buttons[Math.floor(Math.random() * buttons.length)];
     correctButton.textContent = chosenTrack.trackName;
-    correctButton.id = "correct";
     buttons.splice(buttons.indexOf(correctButton), 1);
 
     let wrongChoices = [];
@@ -481,7 +484,7 @@ function resolveMultChoiceRound() {
                 but.disabled = true;
             })
 
-            if (!(this === correctButton)) {
+            if (this !== correctButton) {
                 this.style.color = "var(--soft-red)";
             } else {
                 questionCorrect = true;
@@ -540,11 +543,10 @@ async function displayResults() {
     const pointsElement = document.getElementById("points");
     const accuracyElement = document.getElementById("accuracy");
 
-    const accuracy = Math.round(100 * (correctAnswers / trackListCopy.length));
+    accuracy = Math.round(100 * (correctAnswers / trackListCopy.length));
 
     await accumNumber(pointsElement, points);
     await accumNumber(accuracyElement, accuracy);
-    calculateRank();
 }
 
 // maps difficulties (0/1/2) to default points awarded on correct answer
@@ -601,24 +603,17 @@ function tallyPoints(correct) {
     }
 }
 
-// find a better way to mark correct answers first though lol
-// write another parameter that customizes the impossible rank
-function calculateRank(accuracy) {
+function displayRank(impossibleRank) {
     const rankElement = document.getElementById("rank");
     let rankTitle;
 
-    const maxPointsPossible = () => {
-        if (isTextEntry) {
-            return 350 * trackListCopy.length;
-        } else {
-            return (difficultyToPoints.get(difficulty) + 100) * trackListCopy.length;
-        }
-    }
-    const perfectPercentage = 100 * (points / maxPointsPossible());
+    const maxPointsPossible = isTextEntry ? 350 * trackListCopy.length :
+        (difficultyToPoints.get(difficulty) + 100) * trackListCopy.length;
+    const perfectPercentage = 100 * (points / maxPointsPossible);
     console.log(perfectPercentage);
 
     if (perfectPercentage > 98) {
-        rankTitle = "IMPOSSIBLE";
+        rankTitle = impossibleRank ?? "IMPOSSIBLE";
     } else if (perfectPercentage >= 95 && accuracy >= 100) {
         rankTitle = "P";
     } else if (perfectPercentage >= 90) {
@@ -637,7 +632,7 @@ function calculateRank(accuracy) {
 
     rankElement.previousElementSibling.textContent = rankTitle;
     rankElement.textContent = rankTitle;
-    rankElement.classList.add(rankTitle + "-rank");
+    rankElement.classList.add(rankTitle.replace(" ", "") + "-rank");
     rankElement.hidden = false;
 }
 
