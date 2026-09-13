@@ -15,8 +15,9 @@ Checklist is currently only for Deltarune (first game on the list). More will be
   - / Text entry: entry box, answer feedback after clicked
   - ~~Timing function + points scored~~
   - ~~Next button~~
-  - Progress bar?
+  - ~~Progress indicator~~
   - ~~Results screen~~
+  - Slider for rounds setting
 - ~~Song info data collected from wikis -> converted to TSV -> read by JS~~
 - ~~Song playback using Bandcamp widget~~
   - ~~Create iframe using generalized Bandcamp embed code, replace trackid~~
