@@ -638,7 +638,7 @@ small {
     rotate: 10deg;
     z-index: 15;
     position: fixed;
-    left: -20vw;
+    left: -23vw;
     top: -20vw;
     height: 300%;
     min-width: 0;
@@ -709,6 +709,10 @@ small {
     background-color: transparent;
 }
 
+#roundWrapper {
+    min-height: 140px;
+}
+
 /* ^^ UNIVERSAL ^^ */
 
 .deltarune {
@@ -756,6 +760,7 @@ small {
     }
 
     form {
+        flex-direction: column;
         row-gap: 10px;
         column-gap: 0;
     }
@@ -779,6 +784,13 @@ small {
     }
     #rankDiv {
         margin-top: 31px;
+    }
+
+    #roundWrapper {
+        min-height: initial;
+    }
+    #roundWrapper div {
+        min-width: 170px;
     }
 
     .deltarune {
