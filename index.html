@@ -29,27 +29,30 @@
 <!--    <a href="ultrakill.html" title="ULTRAKILL">-->
 <!--        <img src="graphics/icon_ultrakill.png" alt="ULTRAKILL">-->
 <!--    </a>-->
+<!--    <a href="deepwoken.html" title="Deepwoken">-->
+<!--        <img src="graphics/icon_deepwoken.png" alt="Deepwoken">-->
+<!--    </a>-->
 </aside>
 
 <div class="main settings deltarune">
     <form>
         <div>
             <p>Include chapters:</p>
-            <div class="vertList" id="chapterList">
+            <div class="vertList" id="sectionList">
                 <label class="checkContainer">1
-                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('sectionList', this)">
                     <span class="checkmark"></span>
                 </label>
                 <label class="checkContainer">2
-                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('sectionList', this)">
                     <span class="checkmark"></span>
                 </label>
                 <label class="checkContainer">3
-                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('sectionList', this)">
                     <span class="checkmark"></span>
                 </label>
                 <label class="checkContainer">4
-                    <input type="checkbox" checked="checked" onclick="maintainChecklist('chapterList', this)">
+                    <input type="checkbox" checked="checked" onclick="maintainChecklist('sectionList', this)">
                     <span class="checkmark"></span>
                 </label>
             </div>
@@ -117,23 +120,31 @@
             </div>
         </div>
     </form>
-    <form>
-<!--        <div>-->
-<!--            <p>Rounds:</p>-->
-<!--            <div class="numController">-->
-<!--                <button type="button" class="numController" value="decrease"-->
-<!--                onclick="numController(this, false, 5, 5, 100)"></button>-->
-<!--                <span class="numController" id="rounds">10</span>-->
-<!--                <button type="button" class="numController" value="increase"-->
-<!--                onclick="numController(this, true, 5, 5, 100)"></button>-->
-<!--            </div>-->
-<!--        </div>-->
+    <form style="min-height: 140px">
+        <div>
+            <p>Full track list</p>
+            <label class="switch">
+                <input type="checkbox" id="fullTrackToggle" onclick="checkModesCompatible()" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div id ="custRounds" hidden>
+            <p>Rounds:</p>
+            <div class="numController">
+                <button type="button" class="numController" value="decrease"
+                onclick="numController(this, false, 10, 5, 250)"></button>
+                <span class="numController" id="rounds">20</span>
+                <button type="button" class="numController" value="increase"
+                onclick="numController(this, true, 10, 5, 250)"></button>
+            </div>
+        </div>
     </form>
     <button class="next" onclick="runQuiz()" type="submit">START</button>
 </div>
 
 <div class="main game deltarune">
     <div id="pointDisplay"></div>
+    <small id="progress"><span>0</span>/XX</small>
     <div class="infoDiv">
         <h1 hidden>Track Name</h1>
         <div style="background-color: #333333; width: 80px;">

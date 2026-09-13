@@ -171,10 +171,10 @@ div {
     justify-content: center;
     background-color: rgb(0 0 0 / 0.80);
     border-radius: 2px;
-    transition: max-height 0.2s ease-out, padding 0.2s ease-out;
+    transition: max-width 0.2s ease-out, padding 0.2s ease-out;
 }
 div[hidden] {
-    max-width: 0 !important;
+    max-width: 0;
     overflow: hidden;
     padding: 0;
 }
@@ -297,6 +297,11 @@ div #rankDiv {
 
 #prompt {
     color: var(--gold-yellow);
+}
+
+#sectionList {
+    flex-direction: row;
+    gap: 30px;
 }
 
 .switch {
@@ -690,12 +695,21 @@ small {
     z-index: 20;
 }
 
-/* ^^ UNIVERSAL ^^ */
-
-#chapterList {
-    flex-direction: row;
-    gap: 30px;
+#progress {
+    background-color: rgb(0 0 0 / 0.80);
+    border-radius: 2px;
+    padding: 5px;
+    top: 16px;
+    right: 16px;
+    bottom: initial;
+    opacity: 1;
 }
+
+#gameInfo {
+    background-color: transparent;
+}
+
+/* ^^ UNIVERSAL ^^ */
 
 .deltarune {
     background-image: url(graphics/bg_deltarune.png);
@@ -747,9 +761,8 @@ small {
     }
 
     div[hidden] {
+        max-width: initial;
         max-height: 0;
-        overflow: hidden;
-        padding: 0;
     }
 
     #results {
@@ -783,7 +796,7 @@ small {
 }
 /* Background caption breakpoint */
 @media screen and (max-width: 1000px) {
-    small {
+    small:not(#progress) {
         display: none;
     }
 }

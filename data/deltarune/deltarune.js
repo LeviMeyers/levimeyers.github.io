@@ -5,12 +5,11 @@ let unlistedTracks = false;
 let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
-
-let testElement;
+let rounds = 20;
 
 function collectSettings() {
     chapters = [];
-    const chapSelectInputs = document.getElementById("chapterList")
+    const chapSelectInputs = document.getElementById("sectionList")
         .getElementsByTagName("input");
     for (const input of chapSelectInputs) {
         if (input.checked) {
@@ -41,6 +40,12 @@ function collectSettings() {
                 break;
         }
     }
+
+    const allTracks = document.getElementById("fullTrackToggle");
+    const custRounds = document.getElementById("rounds");
+
+    rounds = allTracks.checked ? null : custRounds.textContent;
+    // if full track list enabled, set rounds to null to be set after tracklist is loaded
 }
 
 async function runQuiz() {
@@ -57,9 +62,12 @@ async function runQuiz() {
         }
     }
 
-    prepareQuiz(isTextEntry, difficulty, mode);
-    while (trackList.length > 0) {
-        await quizRound("deltarune"); // transitionStart() called by final round
+    if (rounds === null || rounds > trackList.length) {
+        rounds = trackList.length;
+    }
+    prepareQuiz(rounds);
+    for (let currentRound = 1; currentRound <= rounds; currentRound++) {
+        await quizRound("deltarune", currentRound); // transitionStart() called by final round
     }
 
     document.querySelector(".game").style.display = "none";
@@ -71,10 +79,7 @@ async function runQuiz() {
 }
 
 // CORE //
-
 let localPlayer;
-
-let textInput;
 
 // runs on page load (mostly eventListener assignments)
 function onLoad() {
@@ -104,6 +109,7 @@ function onLoad() {
             }
         })
     }
+
     document.addEventListener("keydown", event => {
         if (event.key === "Enter" && !(nextButton.hidden)) {
             event.preventDefault();
@@ -168,6 +174,8 @@ function checkModesCompatible() {
     const motif = document.querySelector("input[value=motif]")
     const trackName = document.querySelector("input[value=trackName]")
     const difficultyDiv = document.getElementById("diffWrapper");
+    const allTracks = document.getElementById("fullTrackToggle");
+    const roundSelector = document.getElementById("custRounds");
 
     if (textEntry.checked) {
         locationPlayed.disabled = true;
@@ -184,6 +192,8 @@ function checkModesCompatible() {
     } else {
         difficultyDiv.hidden = false;
     }
+
+    roundSelector.hidden = allTracks.checked;
 }
 
 // button: this
@@ -216,50 +226,6 @@ function modifyNum(numElement, newValue) {
     numElement.textContent = String(newValue);
 
     numElement.classList.add("nudgeAnim");
-}
-
-// when implemented, call once before using setInterval to avoid 500 ms delay
-// nowPlayingLoop; setInterval(nowPlayingLoop, 500);
-function nowPlayingLoop() {
-    const playingElement = document.getElementById("playingStatus")
-    const playingContent = playingElement.textContent;
-
-    switch (playingContent) {
-        default:
-        case "Now playing...":
-            playingElement.textContent = "Now playing.";
-            break;
-        case "Now playing.":
-            playingElement.textContent = "Now playing..";
-            break;
-        case "Now playing..":
-            playingElement.textContent = "Now playing...";
-    }
-}
-// <p id="playingStatus">Get ready!</p>
-
-async function countdownAnim() {
-    const countdownDiv = document.getElementById("countdown");
-    const numbers = countdownDiv.children;
-    const trackName = countdownDiv.previousElementSibling;
-
-    await sleep(1000);
-
-    for (const num of numbers) {
-        num.style.color = "white";
-        num.style.textShadow = "0px 0px 10px rgba(255,255,255,0.5)";
-        await sleep(1000);
-    }
-
-    countdownDiv.style.display = "none";
-    trackName.style.display = "block";
-}
-// <div id="countdown"><span>3</span><span>2</span><span>1</span></div>
-
-function collectTextInput() {
-    const inputArea = document.querySelector("#gameTextEntry textarea");
-
-    textInput = inputArea.value;
 }
 
 async function toggleNameReveal() {
@@ -356,9 +322,8 @@ let trackListCopy = [];
 let chosenTrackIndex;
 let chosenTrack;
 let correctButton;
-// should be module-side variables for isTextEntry, mode, and difficulty
+// should be module-side variables for isTextEntry, mode, difficulty, and rounds
 // use prepareQuiz parameters to set these
-let impossibleRank;
 
 let transitionStarted = false;
 
@@ -369,10 +334,16 @@ let points = 0;
 let correctAnswers = 0;
 let accuracy;
 
-function prepareQuiz(impossRank) {
+let totalRounds;
+let currentRound;
+
+function prepareQuiz(customRounds) {
+    const progressElement = document.getElementById("progress");
+    progressElement.innerHTML = progressElement.innerHTML.replace("XX", customRounds)
+    totalRounds = customRounds
+
     points = 0;
     correctAnswers = 0;
-    impossibleRank = impossRank ?? "IMPOSSIBLE";
 
     trackListCopy = trackList.slice();
 
@@ -405,9 +376,13 @@ async function queueTSV(filePath) {
 }
 
 // game: string
-async function quizRound(game) {
+async function quizRound(game, thisRnd) {
+    currentRound = thisRnd;
+    updateProgress();
+
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
     chosenTrack = trackList[chosenTrackIndex];
+
     console.log(chosenTrack);
 
     questionCorrect = false;
@@ -517,7 +492,7 @@ async function resetRound() {
             nextButton.removeEventListener("click", clickDetector);
             nextButton.hidden = true;
 
-            if (trackList.length > 0) {
+            if (currentRound < totalRounds) {
                 await toggleNameReveal();
             } else {
                 await transitionStart();
@@ -543,7 +518,7 @@ async function displayResults() {
     const pointsElement = document.getElementById("points");
     const accuracyElement = document.getElementById("accuracy");
 
-    accuracy = Math.round(100 * (correctAnswers / trackListCopy.length));
+    accuracy = Math.round(100 * (correctAnswers / totalRounds));
 
     await accumNumber(pointsElement, points);
     await accumNumber(accuracyElement, accuracy);
@@ -607,18 +582,18 @@ function displayRank(impossibleRank) {
     const rankElement = document.getElementById("rank");
     let rankTitle;
 
-    const maxPointsPossible = isTextEntry ? 350 * trackListCopy.length :
-        (difficultyToPoints.get(difficulty) + 100) * trackListCopy.length;
+    const maxPointsPossible = isTextEntry ? 350 * totalRounds :
+        (difficultyToPoints.get(difficulty) + 100) * totalRounds;
     const perfectPercentage = 100 * (points / maxPointsPossible);
     console.log(perfectPercentage);
 
     if (perfectPercentage > 98) {
         rankTitle = impossibleRank ?? "IMPOSSIBLE";
-    } else if (perfectPercentage >= 95 && accuracy >= 100) {
+    } else if (perfectPercentage >= 93 && accuracy >= 100) {
         rankTitle = "P";
-    } else if (perfectPercentage >= 90) {
+    } else if (perfectPercentage >= 93) {
         rankTitle = "S";
-    } else if (perfectPercentage >= 85) {
+    } else if (perfectPercentage >= 85 || (accuracy >= 100 && totalRounds >= 20)) {
         rankTitle = "A";
     } else if (perfectPercentage >= 75) {
         rankTitle = "B";
@@ -634,6 +609,13 @@ function displayRank(impossibleRank) {
     rankElement.textContent = rankTitle;
     rankElement.classList.add(rankTitle.replace(" ", "") + "-rank");
     rankElement.hidden = false;
+}
+
+function updateProgress() {
+    const progressElement = document.getElementById("progress");
+    const currRoundElement = progressElement.firstElementChild
+
+    currRoundElement.textContent = String(currentRound);
 }
 
 // divID: string
