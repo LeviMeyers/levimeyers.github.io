@@ -62,12 +62,10 @@ async function runQuiz() {
         }
     }
 
-    if (rounds === null || rounds > trackList.length) {
-        rounds = trackList.length;
-    }
-    prepareQuiz(rounds);
-    for (let currentRound = 1; currentRound <= rounds; currentRound++) {
-        await quizRound("deltarune", currentRound); // transitionStart() called by final round
+    prepareQuiz(mode, unlistedTracks, difficulty, rounds);
+    let gameRunning = true;
+    while (gameRunning) {
+        gameRunning = await quizRound("deltarune"); // transitionStart() called by final round
     }
 
     document.querySelector(".game").style.display = "none";
@@ -335,17 +333,35 @@ let correctAnswers = 0;
 let accuracy;
 
 let totalRounds;
-let currentRound;
+let currentRound = 1;
 
-function prepareQuiz(customRounds) {
+function prepareQuiz(mode, textEntry, difficulty, customRounds) {
     const progressElement = document.getElementById("progress");
-    progressElement.innerHTML = progressElement.innerHTML.replace("XX", customRounds)
-    totalRounds = customRounds
-
     points = 0;
     correctAnswers = 0;
 
+    if (mode === "locationPlayed") {
+        for (let track of trackList) {
+            if (track.location.length < 1) {
+                trackList.splice(trackList.indexOf(track), 1)
+            }
+        }
+    } else if (mode === "motif") {
+        for (let track of trackList) {
+            if (track.motifs.length < 1) {
+                console.log(track);
+                trackList.splice(trackList.indexOf(track), 1)
+            }
+        }
+    }
     trackListCopy = trackList.slice();
+
+    if (customRounds === null || customRounds > trackList.length) {
+        totalRounds = trackList.length;
+    } else {
+        totalRounds = customRounds;
+    }
+    progressElement.innerHTML = progressElement.innerHTML.replace("XX", totalRounds)
 
     if (!(isTextEntry) && difficulty === 2) { // if hard multiple choice, add extra button to list
         const extraButton = document.createElement("button");
@@ -361,9 +377,11 @@ async function queueTSV(filePath) {
         return {
             trackNumber: +row.trackNumber,
             trackName: row.trackName,
-            location: row.location.split("/"),
-            motifs: row.motifs.split("/").filter(function (m) {
-                return m !== ""; // remove empty string array elements from 0-motif tracks
+            location: row.location.split("/").filter(function(l) {
+                return l !== "";  // remove empty string array elements
+            }),
+            motifs: row.motifs.split("/").filter(function(m) {
+                return m !== "";
             }),
             bandcampID: +row.bandcampID,
             youtubeURL: row.youtubeURL,
@@ -376,8 +394,7 @@ async function queueTSV(filePath) {
 }
 
 // game: string
-async function quizRound(game, thisRnd) {
-    currentRound = thisRnd;
+async function quizRound(game) {
     updateProgress();
 
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
@@ -404,6 +421,9 @@ async function quizRound(game, thisRnd) {
     await resolveMultChoiceRound();
     tallyPoints(questionCorrect);
     await resetRound();
+
+    currentRound++;
+    return currentRound <= totalRounds;
 }
 
 function populateMultipleChoice() {
@@ -419,7 +439,7 @@ function populateMultipleChoice() {
         chosenTrackIndexPull = trackListPull.indexOf(chosenTrack);
     }
 
-    // give a random button the correct track title + "correct" id and remove it from the available buttons list
+    // give a random button the correct track title and remove it from the available buttons list
     correctButton = buttons[Math.floor(Math.random() * buttons.length)];
     correctButton.textContent = chosenTrack.trackName;
     buttons.splice(buttons.indexOf(correctButton), 1);
