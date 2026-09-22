@@ -2,7 +2,7 @@
 
 let chapters = [1, 2, 3, 4];
 let unlistedTracks = false;
-let mode = "trackName"; // trackName; locationPlayed; motif (partially game-dependent)
+let mode = "trackName"; // trackName; location; motif (partially game-dependent)
 let isTextEntry = false;
 let difficulty = 1; // 0 = easy; 1 = medium; 2 = hard
 let rounds = 20;
@@ -26,7 +26,7 @@ function collectSettings() {
     const modeInput = document.querySelector("input[name=quizMode]:checked");
     mode = modeInput.value;
 
-    if (mode === "trackName") {
+    if (mode !== "motif") {
         const diff = document.querySelector("input[name=difficulty]:checked");
         switch(diff.value) {
             case "easy":
@@ -62,7 +62,7 @@ async function runQuiz() {
         }
     }
 
-    prepareQuiz(mode, unlistedTracks, difficulty, rounds);
+    prepareQuiz(mode, isTextEntry, difficulty, rounds);
     let gameRunning = true;
     while (gameRunning) {
         gameRunning = await quizRound("deltarune"); // transitionStart() called by final round
@@ -168,7 +168,7 @@ function maintainChecklist(checklistId, currentCheckbox) {
 
 function checkModesCompatible() {
     const textEntry = document.querySelector("input[value=textEntry]")
-    const locationPlayed = document.querySelector("input[value=locationPlayed]")
+    const location = document.querySelector("input[value=location]")
     const motif = document.querySelector("input[value=motif]")
     const trackName = document.querySelector("input[value=trackName]")
     const difficultyDiv = document.getElementById("diffWrapper");
@@ -176,13 +176,13 @@ function checkModesCompatible() {
     const roundSelector = document.getElementById("custRounds");
 
     if (textEntry.checked) {
-        locationPlayed.disabled = true;
+        location.disabled = true;
 
-        if (locationPlayed.checked) {
+        if (location.checked) {
             trackName.checked = true;
         }
     } else {
-        locationPlayed.disabled = false;
+        location.disabled = false;
     }
 
     if (motif.checked || textEntry.checked) {
@@ -318,7 +318,8 @@ function setEmbedPlayer(source, id, game) {
 let trackList = [];
 let trackListCopy = [];
 let chosenTrackIndex;
-let chosenTrack;
+let chosenTrack; // the track in question to the player
+let chosenAttribute;
 let correctButton;
 // should be module-side variables for isTextEntry, mode, difficulty, and rounds
 // use prepareQuiz parameters to set these
@@ -335,25 +336,17 @@ let accuracy;
 let totalRounds;
 let currentRound = 1;
 
+let targetedTrack; // the track currently being operated on; only used by certain functions
+let targetedAttribute;
+
 function prepareQuiz(mode, textEntry, difficulty, customRounds) {
     const progressElement = document.getElementById("progress");
+    const promptElement = document.getElementById("prompt");
     points = 0;
     correctAnswers = 0;
 
-    if (mode === "locationPlayed") {
-        for (let track of trackList) {
-            if (track.location.length < 1) {
-                trackList.splice(trackList.indexOf(track), 1)
-            }
-        }
-    } else if (mode === "motif") {
-        for (let track of trackList) {
-            if (track.motifs.length < 1) {
-                console.log(track);
-                trackList.splice(trackList.indexOf(track), 1)
-            }
-        }
-    }
+    trackList = removeZeroAttributeTracks(trackList, mode);
+
     trackListCopy = trackList.slice();
 
     if (customRounds === null || customRounds > trackList.length) {
@@ -362,6 +355,18 @@ function prepareQuiz(mode, textEntry, difficulty, customRounds) {
         totalRounds = customRounds;
     }
     progressElement.innerHTML = progressElement.innerHTML.replace("XX", totalRounds)
+
+    switch (mode) {
+        case "trackName":
+            promptElement.textContent = "What is the name of this track?";
+            break;
+        case "location":
+            promptElement.textContent = "Where does this track play?";
+            break;
+        case "motif":
+            promptElement.textContent = "Which motif does this track contain?";
+            break;
+    }
 
     if (!(isTextEntry) && difficulty === 2) { // if hard multiple choice, add extra button to list
         const extraButton = document.createElement("button");
@@ -380,7 +385,7 @@ async function queueTSV(filePath) {
             location: row.location.split("/").filter(function(l) {
                 return l !== "";  // remove empty string array elements
             }),
-            motifs: row.motifs.split("/").filter(function(m) {
+            motif: row.motifs.split("/").filter(function(m) {
                 return m !== "";
             }),
             bandcampID: +row.bandcampID,
@@ -403,7 +408,7 @@ async function quizRound(game) {
     console.log(chosenTrack);
 
     questionCorrect = false;
-    populateMultipleChoice(difficulty);
+    populateMultipleChoice();
 
     if (chosenTrack.bandcampID !== 0) {
         setEmbedPlayer("bandcamp", chosenTrack.bandcampID);
@@ -428,43 +433,140 @@ async function quizRound(game) {
 
 function populateMultipleChoice() {
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
-    let trackListPull = trackList;
-    let chosenTrackIndexPull = chosenTrackIndex;
-
     addKeyInputToList(buttons);
+
+    let trackListPull = structuredClone(trackList); // deep copy tracklist to avoid permanent mutati
+    let chosenTrackIndexPull = chosenTrackIndex;
 
     // if track list is small enough to cause trivial track comparisons, switch references to an untouched copy
     if (trackList.length < Math.floor(trackListCopy.length * 0.20)) {
-        trackListPull = trackListCopy;
+        trackListPull = structuredClone(trackListCopy);
         chosenTrackIndexPull = trackListPull.indexOf(chosenTrack);
     }
 
-    // give a random button the correct track title and remove it from the available buttons list
+    if (mode !== "trackName") {
+        chosenAttribute =
+            (mode === "location") ? // ternary operator for location/motif
+                chosenTrack.location[Math.floor(Math.random() * chosenTrack.location.length)] :
+                chosenTrack.motif[Math.floor(Math.random() * chosenTrack.motif.length)];
+
+        // to avoid matchups containing any of the current track's attributes
+        targetedTrack = chosenTrack;
+        rmTargetTrackAttributesFromElse(trackListPull);
+        trackListPull = removeZeroAttributeTracks(trackListPull, mode);
+    }
+
+    // give a random button the correct answer and remove it from the available buttons list
     correctButton = buttons[Math.floor(Math.random() * buttons.length)];
-    correctButton.textContent = chosenTrack.trackName;
+    if (mode === "trackName") {
+        correctButton.textContent = chosenTrack.trackName;
+    } else {
+        correctButton.textContent = chosenAttribute;
+    }
     buttons.splice(buttons.indexOf(correctButton), 1);
 
-    let wrongChoices = [];
-    if (difficulty === 0) { // choose completely random tracks
-        while (wrongChoices.length < 2) {
-            const randSong = trackListPull[Math.floor(Math.random() * trackListPull.length)];
-            if (!wrongChoices.includes(randSong)
-                && chosenTrack !== randSong) {
-                wrongChoices.push(randSong);
-            }
-        }
-    } else { // choose random tracks in a 2-track radius around the correct one
-        wrongChoices = findAdjacents(trackListPull, chosenTrackIndexPull, 2);
-    }
+    let wrongChoices = generateWrongChoices(trackListPull, chosenTrackIndexPull);
 
     while (buttons.length > 0) {
-        // choose a random wrong answer and delete it from the list
+        // choose a random wrong track and delete it from the list
         const randWrong = wrongChoices.splice(Math.floor(Math.random() * wrongChoices.length), 1)[0];
-        // give a random button the wrong answer and delete it from the buttons list
-        buttons.splice(Math.floor(Math.random() * buttons.length), 1)[0].textContent = randWrong.trackName;
+        if (mode !== "trackName") {
+            trackListPull.splice(trackListPull.indexOf(randWrong), 1);
+            // incorrect choice must also be deleted from trackListPull since attribute modes use it for
+            // advanced searching
+
+            targetedTrack = randWrong;
+            rmTargetTrackAttributesFromElse(trackListPull);
+            trackListPull = removeZeroAttributeTracks(trackListPull, mode);
+
+            // regenerate wrongChoices to account for deleted empty tracks
+            wrongChoices = generateWrongChoices(trackListPull, chosenTrackIndexPull);
+        }
+
+        // give a random button the answer belonging to the wrong track and delete it from the buttons list
+        if (mode === "trackName") {
+            buttons.splice(Math.floor(Math.random() * buttons.length), 1)[0].textContent =
+                randWrong.trackName;
+        } else {
+            buttons.splice(Math.floor(Math.random() * buttons.length), 1)[0].textContent =
+                (mode === "location") ? // ternary operator for location/motif
+                    randWrong.location[Math.floor(Math.random() * randWrong.location.length)] :
+                    randWrong.motif[Math.floor(Math.random() * randWrong.motif.length)];
+        }
     }
+    console.log(trackListPull);
 
     trackList.splice(chosenTrackIndex, 1);
+}
+
+function generateWrongChoices(trackArray, correctIndex) {
+    if (difficulty === 0) { // choose completely random tracks
+        const wrongArray = [];
+
+        while (wrongArray.length < 2) {
+            const randSong = trackArray[Math.floor(Math.random() * trackArray.length)];
+            if (!wrongArray.includes(randSong) && chosenTrack !== randSong) {
+                wrongArray.push(randSong);
+            }
+        }
+
+        return wrongArray;
+    } else { // choose random tracks in a 2-track radius around the correct one
+        return findAdjacents(trackArray, correctIndex, 2);
+    }
+}
+
+function rmTargetTrackAttributesFromElse(trackArray) {
+    switch (mode) {
+        case "location":
+            for (let location of targetedTrack.location) {
+                targetedAttribute = location;
+                trackArray.forEach(removeTargetedAttribute);
+            }
+            break;
+        case "motif":
+            for (let motif of targetedTrack.motif) {
+                targetedAttribute = motif;
+                trackArray.forEach(removeTargetedAttribute);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+function removeTargetedAttribute(track) {
+    switch (mode) {
+        case "location":
+            if (track.location.includes(targetedAttribute)) {
+                track.location.splice(track.location.indexOf(targetedAttribute), 1);
+            }
+            break;
+        case "motif":
+            if (track.motif.includes(targetedAttribute)) {
+                track.motif.splice(track.motif.indexOf(targetedAttribute), 1);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+// trackArray: array = the array to be operated on, filled with objects containing attributes identical to the parameter
+// attribute: string = the object attribute type to be cleaned for repeats (location/motif)
+function removeZeroAttributeTracks(trackArray, attributeType) {
+    switch (attributeType) {
+        case "location":
+            return trackArray.filter(function(track) {
+                return track.location.length > 0;
+            })
+        case "motif":
+            return trackArray.filter(function(track) {
+                return track.motif.length > 0;
+            })
+        default:
+            return trackArray;
+    }
 }
 
 // if embed player click event detection ever implemented, remember to remove focus from the element (blur()?)
@@ -561,7 +663,7 @@ function tallyPoints(correct) {
         case "trackName":
             perfectMs = 3000;
             break;
-        case "locationPlayed":
+        case "location":
             perfectMs = 7000;
             break;
         case "motif":
