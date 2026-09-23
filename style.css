@@ -342,7 +342,7 @@ input:checked + .slider::before {
     transform: translateX(20px);
 }
 
-.checkContainer{
+.checkContainer {
     display: block;
     position: relative;
     padding-left: 35px;
@@ -350,7 +350,7 @@ input:checked + .slider::before {
     cursor: pointer;
     user-select: none;
 }
-.checkContainer input{
+.checkContainer input {
     display: none;
 }
 .checkmark {
@@ -564,13 +564,17 @@ small {
     align-items: center;
     background-color: transparent;
     padding: 0;
+    /*position: relative;*/
+    /*left: 30px;*/
 }
 #gameTextEntry textarea {
     width: min(50vw, 450px);
 }
 #gameTextEntry button {
+    scale: 0.85;
+    right: 6px;
     position: relative;
-    margin: 10px 10px 10px 0;
+    margin: 0;
     width: 50px;
     height: 50px;
     border: none;

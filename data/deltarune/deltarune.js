@@ -74,6 +74,8 @@ async function runQuiz() {
 
     await displayResults();
     displayRank("TOBY FOX");
+
+    await resetGame();
 }
 
 // CORE //
@@ -324,6 +326,8 @@ let correctButton;
 // should be module-side variables for isTextEntry, mode, difficulty, and rounds
 // use prepareQuiz parameters to set these
 
+let normalizedAnswer;
+
 let transitionStarted = false;
 
 let initTime
@@ -361,14 +365,22 @@ function prepareQuiz(mode, textEntry, difficulty, customRounds) {
             promptElement.textContent = "What is the name of this track?";
             break;
         case "location":
-            promptElement.textContent = "Where does this track play?";
+            promptElement.textContent = "Where is this track used?"
             break;
         case "motif":
-            promptElement.textContent = "Which motif does this track contain?";
+            promptElement.textContent = textEntry ? "Enter a motif used by this song." : "Which motif does this song use?"
             break;
     }
 
-    if (!(isTextEntry) && difficulty === 2) { // if hard multiple choice, add extra button to list
+    if (isTextEntry) {
+        document.getElementById("answers").style.display = "none";
+        document.getElementById("gameTextEntry").style.display = "flex";
+    } else {
+        document.getElementById("answers").style.display = "flex";
+        document.getElementById("gameTextEntry").style.display = "none";
+    }
+
+    if (!isTextEntry && difficulty === 2) { // if hard multiple choice, add extra button to list
         const extraButton = document.createElement("button");
         extraButton.classList.add("choice");
         document.getElementById("answers").appendChild(extraButton);
@@ -380,7 +392,6 @@ function prepareQuiz(mode, textEntry, difficulty, customRounds) {
 async function queueTSV(filePath) {
     const data = await d3.tsv(filePath, (row => { // https://d3js.org/d3-fetch#dsv
         return {
-            trackNumber: +row.trackNumber,
             trackName: row.trackName,
             location: row.location.split("/").filter(function(l) {
                 return l !== "";  // remove empty string array elements
@@ -404,11 +415,11 @@ async function quizRound(game) {
 
     chosenTrackIndex = Math.floor(Math.random() * trackList.length);
     chosenTrack = trackList[chosenTrackIndex];
-
-    console.log(chosenTrack);
-
     questionCorrect = false;
-    populateMultipleChoice();
+
+    if (!isTextEntry) {
+        populateMultipleChoice();
+    }
 
     if (chosenTrack.bandcampID !== 0) {
         setEmbedPlayer("bandcamp", chosenTrack.bandcampID);
@@ -423,7 +434,12 @@ async function quizRound(game) {
     }
     initTime = Date.now();
 
-    await resolveMultChoiceRound();
+    console.log(chosenTrack);
+    if (isTextEntry) {
+        await resolveTextEntryRound();
+    } else {
+        await resolveMultChoiceRound();
+    }
     tallyPoints(questionCorrect);
     await resetRound();
 
@@ -494,80 +510,10 @@ function populateMultipleChoice() {
                     randWrong.motif[Math.floor(Math.random() * randWrong.motif.length)];
         }
     }
-    console.log(trackListPull);
 
     trackList.splice(chosenTrackIndex, 1);
 }
 
-function generateWrongChoices(trackArray, correctIndex) {
-    if (difficulty === 0) { // choose completely random tracks
-        const wrongArray = [];
-
-        while (wrongArray.length < 2) {
-            const randSong = trackArray[Math.floor(Math.random() * trackArray.length)];
-            if (!wrongArray.includes(randSong) && chosenTrack !== randSong) {
-                wrongArray.push(randSong);
-            }
-        }
-
-        return wrongArray;
-    } else { // choose random tracks in a 2-track radius around the correct one
-        return findAdjacents(trackArray, correctIndex, 2);
-    }
-}
-
-function rmTargetTrackAttributesFromElse(trackArray) {
-    switch (mode) {
-        case "location":
-            for (let location of targetedTrack.location) {
-                targetedAttribute = location;
-                trackArray.forEach(removeTargetedAttribute);
-            }
-            break;
-        case "motif":
-            for (let motif of targetedTrack.motif) {
-                targetedAttribute = motif;
-                trackArray.forEach(removeTargetedAttribute);
-            }
-            break;
-        default:
-            break;
-    }
-}
-
-function removeTargetedAttribute(track) {
-    switch (mode) {
-        case "location":
-            if (track.location.includes(targetedAttribute)) {
-                track.location.splice(track.location.indexOf(targetedAttribute), 1);
-            }
-            break;
-        case "motif":
-            if (track.motif.includes(targetedAttribute)) {
-                track.motif.splice(track.motif.indexOf(targetedAttribute), 1);
-            }
-            break;
-        default:
-            break;
-    }
-}
-
-// trackArray: array = the array to be operated on, filled with objects containing attributes identical to the parameter
-// attribute: string = the object attribute type to be cleaned for repeats (location/motif)
-function removeZeroAttributeTracks(trackArray, attributeType) {
-    switch (attributeType) {
-        case "location":
-            return trackArray.filter(function(track) {
-                return track.location.length > 0;
-            })
-        case "motif":
-            return trackArray.filter(function(track) {
-                return track.motif.length > 0;
-            })
-        default:
-            return trackArray;
-    }
-}
 
 // if embed player click event detection ever implemented, remember to remove focus from the element (blur()?)
 
@@ -599,6 +545,52 @@ function resolveMultChoiceRound() {
         buttons.forEach((button) => {
             button.addEventListener("click", clickDetector);
         })
+    })
+}
+
+function resolveTextEntryRound() {
+    const textArea = document.querySelector("#gameTextEntry textArea");
+    const submitButton = document.querySelector("#gameTextEntry button");
+
+    return new Promise((resolve) => {
+        async function clickDetector() {
+            submitButton.removeEventListener("click", clickDetector);
+
+            submitButton.hidden = true;
+            textArea.disabled = true;
+
+            normalizedAnswer = normalizeString(textArea.value);
+
+            if (mode === "trackName") {
+                if (normalizedAnswer === normalizeString(chosenTrack.trackName)) {
+                    questionCorrect = true;
+                }
+            } else if (mode === "motif") {
+                let normalizedMotifs = [];
+                chosenTrack.motif.forEach((str) => {
+                    normalizedMotifs.push(normalizeString(str));
+                })
+                console.log(normalizedMotifs);
+
+                if (normalizedMotifs.includes(normalizedAnswer)) {
+                    questionCorrect = true;
+                }
+            }
+
+            if (questionCorrect) {
+                textArea.style.border = "solid 3px var(--accent-green-dark)";
+                textArea.style.color = "var(--accent-green-dark)";
+            } else {
+                textArea.style.color = "var(--soft-red)";
+            }
+
+            document.querySelector(".infoDiv h1").textContent = chosenTrack.trackName;
+            await toggleNameReveal();
+
+            resolve();
+        }
+
+        submitButton.addEventListener("click", clickDetector);
     })
 }
 
@@ -646,6 +638,37 @@ async function displayResults() {
     await accumNumber(accuracyElement, accuracy);
 }
 
+async function resetGame() {
+    const returnButton = document.querySelector(".results button.next");
+    const rankElement = document.getElementById("rank");
+
+
+    await sleep(2000);
+    returnButton.hidden = false;
+
+    return new Promise((resolve) => {
+        async function clickDetector() {
+            returnButton.removeEventListener("click", clickDetector);
+            returnButton.hidden = true;
+
+            await transitionStart();
+            document.querySelector(".results").style.display = "none";
+
+            document.getElementById("points").textContent = "0";
+            document.getElementById("accuracy").textContent = "0";
+            rankElement.textContent = "Z";
+            rankElement.hidden = true;
+
+            document.querySelector(".settings").style.display = "flex";
+            await transitionEnd();
+
+            resolve();
+        }
+
+        returnButton.addEventListener("click", clickDetector);
+    })
+}
+
 // maps difficulties (0/1/2) to default points awarded on correct answer
 const difficultyToPoints = new Map([
     [0, 75],
@@ -657,28 +680,34 @@ const difficultyToPoints = new Map([
 function tallyPoints(correct) {
     const ms = Date.now() - initTime;
     let perfectMs;
+    let timeBonusMs;
     let pts = 0;
 
     switch (mode) {
         case "trackName":
             perfectMs = 3000;
+            timeBonusMs = 10000;
             break;
         case "location":
-            perfectMs = 7000;
+            perfectMs = 5000;
+            timeBonusMs = 12000;
             break;
         case "motif":
-            perfectMs = 8000;
-            difficulty = 2; // test if this works
-            break;
-        case "textEntry":
-            // assign based on length of normalizedAnswer (should be a global variable)
+            perfectMs = 5000;
+            timeBonusMs = 20000;
+            difficulty = 2;
             break;
     }
+    if (isTextEntry) {
+        perfectMs += (Math.round((normalizedAnswer.length / 5)) * 1000); // add 1 second for every 5 characters
+    }
+
+    console.log(perfectMs);
 
     if (correct) {
         correctAnswers++;
 
-        if (mode === "textEntry") {
+        if (isTextEntry) {
             pts = 250;
         } else {
             pts = difficultyToPoints.get(difficulty);
@@ -689,8 +718,8 @@ function tallyPoints(correct) {
         }
         else if (ms <= perfectMs) {
             pts += 100;
-        } else if (ms < (perfectMs + 10000)) {
-            pts += Math.round((100 - ((ms - perfectMs) / 100)));
+        } else if (ms < (perfectMs + timeBonusMs)) {
+            pts += Math.round((100 - ((ms - perfectMs) / (timeBonusMs / 100))));
         }
     }
 
@@ -731,6 +760,77 @@ function displayRank(impossibleRank) {
     rankElement.textContent = rankTitle;
     rankElement.classList.add(rankTitle.replace(" ", "") + "-rank");
     rankElement.hidden = false;
+}
+
+function generateWrongChoices(trackArray, correctIndex) {
+    if (difficulty === 0) { // choose completely random tracks
+        const wrongArray = [];
+
+        while (wrongArray.length < 2) {
+            const randSong = trackArray[Math.floor(Math.random() * trackArray.length)];
+            if (!wrongArray.includes(randSong) && chosenTrack !== randSong) {
+                wrongArray.push(randSong);
+            }
+        }
+
+        return wrongArray;
+    } else { // choose random tracks in a 2-track radius around the correct one
+        return findAdjacents(trackArray, correctIndex, 2);
+    }
+}
+
+function rmTargetTrackAttributesFromElse(trackArray) {
+    switch (mode) {
+        case "location":
+            for (let location of targetedTrack.location) {
+                targetedAttribute = location;
+                trackArray.forEach(removeTargetedAttribute);
+            }
+            break;
+        case "motif":
+            for (let motif of targetedTrack.motif) {
+                targetedAttribute = motif;
+                trackArray.forEach(removeTargetedAttribute);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+// .forEach() function
+function removeTargetedAttribute(track) {
+    switch (mode) {
+        case "location":
+            if (track.location.includes(targetedAttribute)) {
+                track.location.splice(track.location.indexOf(targetedAttribute), 1);
+            }
+            break;
+        case "motif":
+            if (track.motif.includes(targetedAttribute)) {
+                track.motif.splice(track.motif.indexOf(targetedAttribute), 1);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+// trackArray: array = the array to be operated on, filled with objects containing attributes identical to the parameter
+// attribute: string = the object attribute type to be cleaned for repeats (location/motif)
+function removeZeroAttributeTracks(trackArray, attributeType) {
+    switch (attributeType) {
+        case "location":
+            return trackArray.filter(function(track) {
+                return track.location.length > 0;
+            })
+        case "motif":
+            return trackArray.filter(function(track) {
+                return track.motif.length > 0;
+            })
+        default:
+            return trackArray;
+    }
 }
 
 function updateProgress() {
@@ -792,10 +892,19 @@ function normalizeUnlisted(trackName) {
     if (trackName.includes(".ogg")
     || trackName.includes(".mp3")
     || trackName.includes(".wav")) {
-        return trackName.substring(0, trackName.length - 4);
+        return trackName.substring(0, trackName.length - 4).replace("_", " ");
     } else {
-        return trackName;
+        return trackName.replace("_", " ");
     }
+}
+
+function normalizeString(string) {
+    let str = normalizeUnlisted(string);
+    str = str.split("").filter(char => {
+        return /[a-zA-Z0-9 ]/.test(char);
+    }).join("");
+
+    return str.toUpperCase();
 }
 
 async function transitionStart() {
