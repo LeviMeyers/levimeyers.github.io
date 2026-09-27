@@ -403,6 +403,8 @@ async function queueTSV(filePath) {
             youtubeURL: row.youtubeURL,
         }
     }))
+
+    trackList.splice(0, trackList.length); // erase previous trackList
     data.forEach((row) => {
         trackList.push(row);
     })
@@ -420,6 +422,7 @@ async function quizRound(game) {
     if (!isTextEntry) {
         populateMultipleChoice();
     }
+    trackList.splice(chosenTrackIndex, 1);
 
     if (chosenTrack.bandcampID !== 0) {
         setEmbedPlayer("bandcamp", chosenTrack.bandcampID);
@@ -451,7 +454,7 @@ function populateMultipleChoice() {
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
     addKeyInputToList(buttons);
 
-    let trackListPull = structuredClone(trackList); // deep copy tracklist to avoid permanent mutati
+    let trackListPull = structuredClone(trackList); // deep copy tracklist to avoid permanent mutation
     let chosenTrackIndexPull = chosenTrackIndex;
 
     // if track list is small enough to cause trivial track comparisons, switch references to an untouched copy
@@ -510,8 +513,6 @@ function populateMultipleChoice() {
                     randWrong.motif[Math.floor(Math.random() * randWrong.motif.length)];
         }
     }
-
-    trackList.splice(chosenTrackIndex, 1);
 }
 
 
@@ -622,6 +623,7 @@ async function resetRound() {
                 button.disabled = false;
                 button.attributeStyleMap.clear();
             })
+            document.querySelector("#gameTextEntry button").hidden = false;
 
             resolve();
         }
@@ -644,7 +646,6 @@ async function resetGame() {
     const returnButton = document.querySelector(".results button.next");
     const rankElement = document.getElementById("rank");
 
-
     await sleep(2000);
     returnButton.hidden = false;
 
@@ -656,6 +657,8 @@ async function resetGame() {
             await transitionStart();
             document.querySelector(".results").style.display = "none";
 
+            currentRound = 1;
+            await toggleNameReveal();
             document.getElementById("points").textContent = "0";
             document.getElementById("accuracy").textContent = "0";
             rankElement.textContent = "Z";
@@ -703,8 +706,6 @@ function tallyPoints(correct) {
     if (isTextEntry) {
         perfectMs += (Math.round((normalizedAnswer.length / 5)) * 1000); // add 1 second for every 5 characters
     }
-
-    console.log(perfectMs);
 
     if (correct) {
         correctAnswers++;

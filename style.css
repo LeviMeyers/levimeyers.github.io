@@ -147,11 +147,11 @@ h2 {
 
 .settings {
     padding-bottom: 100px;
-    /*display: none;*/
+    display: none;
 }
 
 .game {
-    display: none;
+    /*display: none;*/
 }
 .results {
     display: none;
@@ -519,6 +519,9 @@ textarea {
     height: 1em;
     width: 400px;
 }
+textarea[disabled] {
+    opacity: 1;
+}
 textarea:focus {
     outline: none;
 }
@@ -564,31 +567,30 @@ small {
     align-items: center;
     background-color: transparent;
     padding: 0;
-    /*position: relative;*/
-    /*left: 30px;*/
+    position: relative;
+    left: 22px;
 }
 #gameTextEntry textarea {
     width: min(50vw, 450px);
+    margin-right: 7px;
 }
 #gameTextEntry button {
-    scale: 0.85;
-    right: 6px;
     position: relative;
     margin: 0;
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
     border: none;
     background-color: var(--accent-green);
 }
 #gameTextEntry button::after {
     content: "";
     position: absolute;
-    left: 18px;
-    top: 7px;
+    left: 15px;
+    top: 4px;
     width: 10px;
     height: 25px;
     border: solid white;
-    border-width: 0 5px 5px 0;
+    border-width: 0 4px 4px 0;
     transform: rotate(45deg);
 }
 #gameTextEntry button:active, #gameTextEntry button:focus {
@@ -597,8 +599,8 @@ small {
     transform: translateY(2px);
 }
 #gameTextEntry button[hidden] {
-    max-height: unset;
-    max-width: 0;
+    max-height: 0;
+    max-width: unset;
     overflow: hidden;
     padding: 0;
     margin: 0;
@@ -716,6 +718,16 @@ small {
 #roundWrapper {
     min-height: 140px;
 }
+
+#feedback {
+    position: relative;
+    bottom: 20px;
+    margin: 0;
+    background-color: rgb(0 0 0 / 0.4);
+    padding: 10px 15px 15px;
+    font-size: 21px;
+}
+/* add colored spans with correct answers */
 
 /* ^^ UNIVERSAL ^^ */
 
