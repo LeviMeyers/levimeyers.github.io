@@ -597,6 +597,7 @@ function resolveTextEntryRound() {
 async function resetRound() {
     const nextButton = document.querySelector(".game button.next");
     const buttons = Array.from(document.querySelectorAll("#answers button.choice"));
+    const textArea = document.querySelector("#gameTextEntry textarea")
 
     await sleep(1000);
     nextButton.hidden = false;
@@ -614,8 +615,9 @@ async function resetRound() {
             }
 
             document.querySelector(".infoDiv h1").textContent = "";
-            document.querySelector("#gameTextEntry textarea").textContent = "";
-            document.querySelector("#gameTextEntry textarea").attributeStyleMap.clear();
+            textArea.value = "";
+            textArea.attributeStyleMap.clear();
+            textArea.disabled = false;
             buttons.forEach((button) => {
                 button.disabled = false;
                 button.attributeStyleMap.clear();
