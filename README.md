@@ -3,7 +3,7 @@ Early-stage OST guessing game website
 
 Checklist is currently only for Deltarune (first game on the list). More will be added later
 - ~~Navigation sidebar~~
-- ~~Settings page:~~
+- Settings page:
   - ~~Chapter select~~
   - ~~Unlisted tracks toggle~~
   - ~~Multiple choice modes: track name, motif, location played~~
@@ -12,13 +12,13 @@ Checklist is currently only for Deltarune (first game on the list). More will be
 - Repeatable game round page using data from settings + song info
   - ~~Prompt: track name, motif, location played~~
   - ~~Multiple choice: 3+ buttons, answer feedback on buttons after clicked~~
-  - / Text entry: ~~entry box~~, answer feedback after clicked
+  - ~~Text entry: entry box, answer feedback after clicked~~
   - ~~Timing function + points scored~~
   - ~~Next button~~
   - ~~Progress indicator~~
   - ~~Results screen~~
 - ~~Song info data collected from wikis -> converted to TSV -> read by JS~~
-- ~~Song playback using Bandcamp widget~~
+- Song playback using Bandcamp widget
   - ~~Create iframe using generalized Bandcamp embed code, replace trackid~~
   - ~~Find a way to collect Bandcamp track ids in bulk~~
 - ~~Song playback using YouTube widget if not available on Bandcamp~~

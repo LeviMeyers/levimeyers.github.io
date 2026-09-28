@@ -49,7 +49,10 @@ function collectSettings() {
 }
 
 async function runQuiz() {
+    const startButton = document.querySelector(".settings .next");
+
     collectSettings();
+    startButton.disabled = true;
 
     await transitionStart();
     document.querySelector(".settings").style.display = "none";
@@ -76,6 +79,7 @@ async function runQuiz() {
     displayRank("TOBY FOX");
 
     await resetGame();
+    startButton.disabled = false;
 }
 
 // CORE //
@@ -228,11 +232,13 @@ function modifyNum(numElement, newValue) {
     numElement.classList.add("nudgeAnim");
 }
 
-async function toggleNameReveal() {
+async function toggleNameReveal(togglePrompt) {
     const trackHeader = document.querySelector(".infoDiv h1");
     const prompt = document.querySelector(".infoDiv p");
 
-    prompt.hidden = !prompt.hidden;
+    if (togglePrompt) {
+        prompt.hidden = !prompt.hidden;
+    }
     await sleep(150);
     trackHeader.hidden = !trackHeader.hidden;
 }
@@ -314,6 +320,12 @@ function setEmbedPlayer(source, id, game) {
     }
 }
 
+async function cooldown(element, cooldownMs) {
+    element.disabled = true;
+    await sleep(cooldownMs);
+    element.disabled = false;
+}
+
 // QUIZ //
 
 // trackList must be accessible by other modules
@@ -345,7 +357,6 @@ let targetedAttribute;
 
 function prepareQuiz(mode, textEntry, difficulty, customRounds) {
     const progressElement = document.getElementById("progress");
-    const promptElement = document.getElementById("prompt");
     points = 0;
     correctAnswers = 0;
 
@@ -360,17 +371,7 @@ function prepareQuiz(mode, textEntry, difficulty, customRounds) {
     }
     progressElement.innerHTML = progressElement.innerHTML.replace("XX", totalRounds)
 
-    switch (mode) {
-        case "trackName":
-            promptElement.textContent = "What is the name of this track?";
-            break;
-        case "location":
-            promptElement.textContent = "Where is this track used?"
-            break;
-        case "motif":
-            promptElement.textContent = textEntry ? "Enter a motif used by this song." : "Which motif does this song use?"
-            break;
-    }
+    setPrompt();
 
     if (isTextEntry) {
         document.getElementById("answers").style.display = "none";
@@ -538,7 +539,7 @@ function resolveMultChoiceRound() {
             correctButton.style.color = "var(--accent-green-dark)";
 
             document.querySelector(".infoDiv h1").textContent = chosenTrack.trackName;
-            await toggleNameReveal();
+            await toggleNameReveal(true);
 
             resolve();
         }
@@ -571,7 +572,6 @@ function resolveTextEntryRound() {
                 chosenTrack.motif.forEach((str) => {
                     normalizedMotifs.push(normalizeString(str));
                 })
-                console.log(normalizedMotifs);
 
                 if (normalizedMotifs.includes(normalizedAnswer)) {
                     questionCorrect = true;
@@ -583,10 +583,14 @@ function resolveTextEntryRound() {
                 textArea.style.color = "var(--accent-green-dark)";
             } else {
                 textArea.style.color = "var(--soft-red)";
+
+                if (mode === "motif") {
+                    setTimeout(displayTextFeedback, 150); // display feedback AFTER name has been revealed
+                }
             }
 
             document.querySelector(".infoDiv h1").textContent = chosenTrack.trackName;
-            await toggleNameReveal();
+            await toggleNameReveal(mode !== "motif" || questionCorrect);
 
             resolve();
         }
@@ -609,16 +613,23 @@ async function resetRound() {
             nextButton.hidden = true;
 
             if (currentRound < totalRounds) {
-                await toggleNameReveal();
+                await toggleNameReveal((mode !== "motif" && !isTextEntry) || questionCorrect);
             } else {
                 await transitionStart();
                 setEmbedPlayer();
             }
 
             document.querySelector(".infoDiv h1").textContent = "";
-            textArea.value = "";
-            textArea.attributeStyleMap.clear();
-            textArea.disabled = false;
+            if (mode === "motif") {
+                textArea.value = "";
+                textArea.attributeStyleMap.clear();
+                textArea.disabled = false;
+
+                if (isTextEntry) {
+                    setPrompt("Enter a motif used by this song:");
+                    document.getElementById("prompt").attributeStyleMap.clear();
+                }
+            }
             buttons.forEach((button) => {
                 button.disabled = false;
                 button.attributeStyleMap.clear();
@@ -652,10 +663,11 @@ async function resetGame() {
     return new Promise((resolve) => {
         async function clickDetector() {
             returnButton.removeEventListener("click", clickDetector);
-            returnButton.hidden = true;
 
             await transitionStart();
             document.querySelector(".results").style.display = "none";
+
+            returnButton.hidden = true;
 
             currentRound = 1;
             await toggleNameReveal();
@@ -833,6 +845,43 @@ function removeZeroAttributeTracks(trackArray, attributeType) {
             })
         default:
             return trackArray;
+    }
+}
+
+function displayTextFeedback() {
+    const promptElement = document.getElementById("prompt");
+    promptElement.textContent = "Correct answers: ";
+    promptElement.style.color = "white";
+
+    for (let i = 0; i < chosenTrack.motif.length; i++) {
+        const ans = document.createElement("span");
+        ans.textContent = chosenTrack.motif[i];
+        ans.style.color = "var(--accent-green-dark)";
+        promptElement.appendChild(ans);
+
+        if (i < chosenTrack.motif.length - 1) {
+            promptElement.innerHTML = promptElement.innerHTML + ", ";
+        }
+    }
+}
+
+function setPrompt(forcePrompt) {
+    const promptElement = document.getElementById("prompt");
+
+    if (forcePrompt) {
+        promptElement.textContent = forcePrompt;
+    } else {
+        switch (mode) {
+            case "trackName":
+                promptElement.textContent = "What is the name of this track?";
+                break;
+            case "location":
+                promptElement.textContent = "Where is this track used?"
+                break;
+            case "motif":
+                promptElement.textContent = isTextEntry ? "Enter a motif used by this song:" : "Which motif does this song use?"
+                break;
+        }
     }
 }
 
