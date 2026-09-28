@@ -620,16 +620,14 @@ async function resetRound() {
             }
 
             document.querySelector(".infoDiv h1").textContent = "";
-            if (mode === "motif") {
-                textArea.value = "";
-                textArea.attributeStyleMap.clear();
-                textArea.disabled = false;
-
-                if (isTextEntry) {
-                    setPrompt("Enter a motif used by this song:");
-                    document.getElementById("prompt").attributeStyleMap.clear();
-                }
+            if (mode === "motif" && isTextEntry) {
+                setPrompt("Enter a motif used by this song:");
+                document.getElementById("prompt").attributeStyleMap.clear();
             }
+            textArea.value = "";
+            textArea.attributeStyleMap.clear();
+            textArea.disabled = false;
+
             buttons.forEach((button) => {
                 button.disabled = false;
                 button.attributeStyleMap.clear();
