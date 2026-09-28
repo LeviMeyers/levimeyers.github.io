@@ -613,23 +613,21 @@ async function resetRound() {
             nextButton.hidden = true;
 
             if (currentRound < totalRounds) {
-                await toggleNameReveal((mode !== "motif" && !isTextEntry) || questionCorrect);
+                await toggleNameReveal(mode !== "motif" || !isTextEntry || questionCorrect);
             } else {
                 await transitionStart();
                 setEmbedPlayer();
             }
 
             document.querySelector(".infoDiv h1").textContent = "";
-            if (mode === "motif") {
-                textArea.value = "";
-                textArea.attributeStyleMap.clear();
-                textArea.disabled = false;
-
-                if (isTextEntry) {
-                    setPrompt("Enter a motif used by this song:");
-                    document.getElementById("prompt").attributeStyleMap.clear();
-                }
+            if (mode === "motif" && isTextEntry) {
+                setPrompt("Enter a motif used by this song:");
+                document.getElementById("prompt").attributeStyleMap.clear();
             }
+            textArea.value = "";
+            textArea.attributeStyleMap.clear();
+            textArea.disabled = false;
+
             buttons.forEach((button) => {
                 button.disabled = false;
                 button.attributeStyleMap.clear();
