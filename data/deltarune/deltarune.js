@@ -255,7 +255,7 @@ function playerIconToggle(customPlayer) {
 let prevEmbed;
 
 // source: string = "youtube", "bandcamp", "local". any other string will just delete previous embed
-// id: string/number = youtube video ID, bandcamp track ID, or ogg name
+// id: string/number = youtube video ID, bandcamp track ID, or ogg name (file extension included)
 // game: string = only applicable if calling as ogg. should match a directory under music/
 function setEmbedPlayer(source, id, game) {
     const playerDiv = document.querySelector(".infoDiv div");
@@ -301,7 +301,7 @@ function setEmbedPlayer(source, id, game) {
             break;
 
         case "local":
-            if (id.includes("ogg") || id.includes("mp3") || id.includes("wav")) {
+            if (id.includes(".ogg") || id.includes(".mp3") || id.includes(".wav")) {
                 localPlayer.src = "music/" + game + "/" + id;
             } else {
                 localPlayer.src = "music/" + game + "/" + id + ".ogg";
@@ -430,7 +430,7 @@ async function quizRound(game) {
     } else if (chosenTrack.youtubeURL !== "") {
         setEmbedPlayer("youtube", chosenTrack.youtubeURL);
     } else {
-        setEmbedPlayer("local", normalizeUnlisted(chosenTrack.trackName), game);
+        setEmbedPlayer("local", chosenTrack.trackName, game);
     }
 
     if (transitionStarted) {
@@ -757,7 +757,7 @@ function displayRank(impossibleRank) {
         rankTitle = "P";
     } else if (perfectPercentage >= 93) {
         rankTitle = "S";
-    } else if (perfectPercentage >= 85 || (accuracy >= 100 && totalRounds >= 20)) {
+    } else if (perfectPercentage >= 85 || (accuracy >= 90 && totalRounds >= 20)) {
         rankTitle = "A";
     } else if (perfectPercentage >= 75) {
         rankTitle = "B";
@@ -937,19 +937,18 @@ function findAdjacents(array, index, radius) {
 }
 // returns an array of size radius * 2
 
-// trackName: string
-function normalizeUnlisted(trackName) {
-    if (trackName.includes(".ogg")
-    || trackName.includes(".mp3")
-    || trackName.includes(".wav")) {
-        return trackName.substring(0, trackName.length - 4).replace("_", " ");
-    } else {
-        return trackName.replace("_", " ");
-    }
-}
-
 function normalizeString(string) {
-    let str = normalizeUnlisted(string);
+    let str = string;
+
+    if (str.includes(".ogg")
+        || str.includes(".mp3")
+        || str.includes(".wav")) {
+        str = str.substring(0, string.length - 4);
+    }
+
+    str = str.replace("_", " ");
+    str = str.replace(" (from Rose of Winter)", "");
+
     str = str.split("").filter(char => {
         return /[a-zA-Z0-9 ]/.test(char);
     }).join("");

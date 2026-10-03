@@ -423,8 +423,10 @@ button[hidden] {
     margin: 0;
     border: none;
 }
-button[disabled] {
+button[disabled]:not(.next) {
     cursor: default;
+    border: solid var(--main-grey) 3px;
+    color: var(--main-grey);
 }
 
 div.numController {
