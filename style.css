@@ -746,7 +746,7 @@ small {
 /* ^^ UNIVERSAL ^^ */
 
 .deltarune {
-    background-image: url(graphics/bg_deltarune.png);
+    background-image: url(/graphics/bg_deltarune.png);
 }
 
 /* General mobile responsivity */
