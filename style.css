@@ -33,6 +33,16 @@ aside {
     background-color: var(--main-grey);
     box-shadow: 20px 0 40px 19px rgba(0, 0, 0, 0.30);
 }
+.topbar {
+    top: 0;
+    position: absolute;
+    width: 100%;
+    height: initial;
+    flex-direction: row;
+    background-color: var(--main-grey-dark);
+    box-shadow: none;
+    padding: 20px 0;
+}
 aside a {
     width: 60px;
     display: flex;
@@ -741,7 +751,68 @@ small {
     margin: 0;
     overflow: hidden;
 }
-/* add colored spans with correct answers */
+
+#logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0;
+    background: none;
+    width: 500px;
+    z-index: 22;
+    filter: drop-shadow(6px 5px 25px black);
+}
+#logo img {
+    background-color: var(--main-grey);
+    padding: 15px;
+    width: calc(100% - 30px);
+}
+#logo div {
+    width: 0; height: 0;
+    border-style: solid;
+    background: none;
+    padding: 0;
+    border-width: 0 0 120px 500px;
+    border-color: transparent transparent transparent var(--main-grey);
+    transform: rotate(0deg);
+}
+
+
+.gameTitle {
+    width: 500px;
+    border: solid white 6px;
+}
+.gameTitle a img {
+    width: 100%;
+}
+
+.menu {
+    margin-left: 455px;
+}
+
+#menubody {
+    background-image: url(/graphics/hexagon_pattern_blurred.png);
+    background-repeat: repeat;
+    background-size: 130vh;
+    z-index: 0;
+}
+
+#options {
+    width: 200px;
+    top: 250px;
+    background-color: var(--accent-green-dark);
+    height: calc(100% - 250px);
+}
+#options a {
+    position: relative;
+    color: black;
+    font-size: 37px;
+    width: 180px;
+}
+#options a:hover {
+    background-color: var(--accent-green);
+    width: 100%;
+}
 
 /* ^^ UNIVERSAL ^^ */
 
@@ -787,6 +858,10 @@ small {
     .main {
         margin-left: 0;
         padding-top: 60px;
+    }
+    .menu {
+        margin: 0;
+        padding-top: 15px;
     }
 
     form {
